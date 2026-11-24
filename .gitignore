@@ -5,3 +5,5 @@ outputs/
 *.mp4
 *.npz
 .cache/
+build/
+*.egg-info/

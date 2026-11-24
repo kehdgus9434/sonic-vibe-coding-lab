@@ -68,12 +68,10 @@ def test_mirrored_sample_loads(lab):
     assert m.local24.shape[1:] == (24, 3)
 
 
-def test_mode0_check_and_reflection(lab):
+def test_mode0_check(lab):
     from sonic_lab import check
     assert check.encoder_obs_mode0(lab, lambda m, f, r, a: lab.policy.encoder_obs(m, f, r, a, 0))
     assert not check.encoder_obs_mode0(lab, lambda m, f, r, a: lab.policy.encoder_obs(m, f, r, a, 2))
-    assert not check.reflection({})
-    assert check.reflection({k: "충분히 긴 답변" for k in check.REFLECTION_KEYS})
 
 
 def test_oracle_calls_are_counted(lab):

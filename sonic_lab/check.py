@@ -15,7 +15,7 @@ from scipy.spatial.transform import Rotation as R
 from . import reference as ref
 
 OK, NG = "✅", "❌"
-ORACLE_CALLS = {}   # Day 2: 정답 비교(오라클) 호출 횟수 — 제출 카드에 함께 기록됩니다
+ORACLE_CALLS = {}   # Day 2: 정답 비교(오라클) 호출 횟수
 
 
 def _count(name):
@@ -287,19 +287,6 @@ def invariant_tests(lab, test_fn):
 # ---------------------------------------------------------------------------
 # Day 3
 # ---------------------------------------------------------------------------
-
-REFLECTION_KEYS = ["예측과 실제가 달랐던 것", "AI가 틀렸던 순간과 알아챈 방법",
-                   "가장 믿을 만한 ✅와 그 근거", "정답 비교 없이 내가 확인한 것"]
-
-
-def reflection(card: dict):
-    """매 Day 마지막 제출 카드. 에이전트가 아니라 본인이 작성합니다."""
-    missing = [k for k in REFLECTION_KEYS if len(str(card.get(k, "")).strip()) < 5]
-    _say(not missing, "제출 카드", "비었거나 너무 짧은 항목: " + ", ".join(missing) if missing else "")
-    if ORACLE_CALLS:
-        print("   정답 비교 호출 기록:", ORACLE_CALLS)
-    return not missing
-
 
 def experiment_card(card: dict):
     need = ["가설", "변인", "지표", "통제조건", "결과", "해석", "한계"]

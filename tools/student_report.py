@@ -226,7 +226,7 @@ def main():
         links = " · ".join(f"[{n.split('_')[0].upper()}]({a.colab_prefix}/colab/{n})" for n in notebooks)
         body += ["", f"**▶ Colab에서 내 브랜치로 열기**: {links}",
                  "> 열면 0번 셀의 REPO/BRANCH가 이 브랜치로 채워져 있고 `my_work` 코드를 불러옵니다. "
-                 "🔮 예측·🧾 검증 기록·📮 제출 카드는 거기서 **직접** 작성하세요."]
+                 "🔮 예측·🧾 검증 기록은 거기서 **직접** 작성하세요."]
     body += ["", "> 이 리포트는 코드가 실행되는지와 체크 결과를 보여 줄 뿐입니다. ✅가 '맞는 이유'로 나왔는지 판단하는 것은 당신의 몫입니다."]
     for text, made in sections:
         body += ["", text]
