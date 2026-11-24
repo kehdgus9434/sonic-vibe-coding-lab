@@ -22,26 +22,22 @@ README의 **Open in Colab** 배지를 누르고 맨 위 `0. 실습 환경 준비
 ### B. Colab 내장 AI
 셀의 AI 기능에 미션 설명과 "docs/01_contract.md의 규칙을 따른다"를 함께 적습니다. 계약서 내용을 직접 붙여 주는 편이 정확합니다.
 
-### C. 에이전트가 Colab 노트북을 직접 조작 — Colab MCP 서버
-Google이 공개한 [Colab MCP 서버](https://github.com/googlecolab/colab-mcp)를 쓰면 **내 컴퓨터에서 실행 중인 에이전트**(Claude Code, Gemini CLI 등)가 브라우저에 열린 Colab 노트북의 셀을 만들고 실행할 수 있습니다.
+### C. 에이전트가 Colab 노트북을 직접 조작 — Colab MCP 서버 (선택)
+Google의 [Colab MCP 서버](https://github.com/googlecolab/colab-mcp)를 쓰면 **내 컴퓨터에서 실행 중인 에이전트**(Claude Code, Gemini CLI 등)가 브라우저의 Colab 노트북에 셀을 만들고 실행할 수 있습니다. 클라우드에서 도는 에이전트(웹 채팅 등)는 쓸 수 없습니다.
 
-필요한 것: Python, git, `uv`(`pip install uv`). 에이전트의 MCP 설정에 아래 서버를 추가한 뒤 에이전트를 다시 시작하고, 브라우저에서 노트북을 연 상태로 작업을 지시합니다.
-
-```json
-{
-  "mcpServers": {
-    "colab-proxy-mcp": {
-      "command": "uvx",
-      "args": ["git+https://github.com/googlecolab/colab-mcp"],
-      "timeout": 30000
-    }
-  }
-}
-```
-
-- Claude Code: `claude mcp add colab-proxy-mcp -- uvx git+https://github.com/googlecolab/colab-mcp`
-- Codex는 공식 호환 목록에 없어 동작을 보장하지 않습니다. 쓰려면 수업 전에 직접 확인하세요.
-- 에이전트에게 처음 줄 지시 예: "이 노트북은 sonic-vibe-coding-lab 실습이다. 저장소의 AGENTS.md 규칙을 따르고, 🔮/🧾/📮 셀은 절대 작성하지 마라."
+1. `uv` 설치: `pip install uv` (서버가 Python 3.13 이상을 요구하지만 `uvx`가 알아서 받습니다)
+2. 첫 실행이 느리므로 미리 한 번 받아 두기: `uvx git+https://github.com/googlecolab/colab-mcp --help`
+3. 에이전트에 등록
+   - Claude Code: `claude mcp add colab-mcp -- uvx git+https://github.com/googlecolab/colab-mcp` → `claude mcp list`로 확인
+   - Codex(공식 호환 목록에 없음, 동작 미보장): `~/.codex/config.toml`에
+     ```toml
+     [mcp_servers.colab-mcp]
+     command = "uvx"
+     args = ["git+https://github.com/googlecolab/colab-mcp"]
+     startup_timeout_sec = 60
+     ```
+4. 에이전트에게 "Colab에 연결해 줘"라고 하면 `open_colab_browser_connection` 도구가 브라우저에 **새 빈 Colab 노트북**을 엽니다. 60초 안에 연결되면 노트북 편집·실행 도구가 나타납니다(한 번에 브라우저 탭 1개만 연결).
+5. ⚠️ 연결되는 곳은 **새 빈 노트북**입니다. 이 과정의 노트북(day1 등)을 바로 조작하지 않습니다. 에이전트에게 Day 노트북의 `0. 실습 환경 준비` 코드를 그 노트북에서 실행하게 한 뒤 미션 코드를 맡기고, 🔮/🧾/📮은 과정 노트북(다른 탭)이나 `templates/`에 본인이 씁니다. 과정 노트북 자체에서 에이전트와 작업하려면 D의 VS Code + Colab 확장이 더 단순합니다.
 
 ### D. 에이전트형 도구로 로컬 편집 (Claude Code, Codex, Cursor 등)
 1. 이 저장소를 **Fork** → 로컬에 clone. 에이전트는 `AGENTS.md`/`CLAUDE.md`에서 실습 규칙을 자동으로 읽습니다.
