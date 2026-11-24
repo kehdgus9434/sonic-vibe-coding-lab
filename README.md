@@ -6,7 +6,8 @@ NVIDIA **GEAR-SONIC** 공개 모델(사람/로봇 모션 → 64차원 토큰 →
 **AI 코딩 도구가 만든 연구 코드를 어떻게 믿을 수 있게 만드는지** 3일(2시간 × 3회) 동안 실습합니다.
 
 - 대상: 코딩 경험이 있는 대학원생 · 이론 강의 최소화 · 과제 없음
-- AI 도구: **자유, 에이전트 사용 전제** (웹 채팅, Colab 내장 AI, Colab MCP로 노트북을 직접 조작하는 Claude Code 등, VS Code + Colab 확장)
+- 환경: **브라우저만** — 공용 컴퓨터실(Windows)·개인 노트북 어디서나, 설치 없음
+- AI 도구: **자유, 에이전트 사용 전제** — Colab의 Gemini, 웹 채팅(ChatGPT·Claude·Gemini), 웹 코딩 에이전트(Claude Code on the web, Codex)
 - 평가: 코드가 아니라 **판단** — 실행 전 🔮 예측, 체크 후 🧾 검증 기록, 매 Day 📮 제출 카드 (본인 작성)
 - 실행 환경: **Google Colab CPU 런타임**으로 충분 (GPU는 영상 렌더링만 빨라짐)
 
@@ -24,7 +25,7 @@ NVIDIA **GEAR-SONIC** 공개 모델(사람/로봇 모션 → 64차원 토큰 →
 
 | 문서 | 내용 |
 |---|---|
-| [`docs/00_setup.md`](docs/00_setup.md) | Colab 실행, 도구별(웹 채팅 / Colab AI / 에이전트형) 작업 방식, 로컬 conda 실행 |
+| [`docs/00_setup.md`](docs/00_setup.md) | 브라우저만으로 시작하기: Colab, AI 도구 3가지 방식(Colab Gemini / 웹 채팅 / 웹 코딩 에이전트), 공용 PC 주의 |
 | [`docs/01_contract.md`](docs/01_contract.md) | **입출력 계약서** — AI 코드가 맞는지 판단하는 유일한 기준. 바이브 코딩 도구에 통째로 넣으세요 |
 | [`docs/02_vibe_coding_guide.md`](docs/02_vibe_coding_guide.md) | 연구 코드 바이브 코딩 원칙, 프롬프트 템플릿, 이 자료가 만들어진 실제 과정(01→08) |
 | [`docs/03_checklist.md`](docs/03_checklist.md) | AI가 만든 연구 코드 검증 체크리스트 |
@@ -42,7 +43,7 @@ sonic_lab/            실습 지원 패키지 (자산 다운로드, 참조 구�
   └─ check.py         ⚠️ 채점 로직 — 실습 중에는 열지 않기
 AGENTS.md, CLAUDE.md  에이전트형 도구가 자동으로 읽는 실습 규칙
 tests/                관리자용 오프라인 테스트 (가짜 모델)
-tools/                노트북 생성기(build_notebooks.py), 저장소 주소 변경(set_repo.py), 실제 모델 점검(real_model_check.py)
+tools/                노트북 생성기, 저장소 주소 변경(set_repo.py), 실제 모델 점검, 웹 에이전트 환경 준비(agent_setup.sh)
 ```
 
 ## 관리

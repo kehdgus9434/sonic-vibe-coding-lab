@@ -1,61 +1,78 @@
-# 시작하기
+# 시작하기 — 브라우저만으로 (공용 컴퓨터실 Windows · 개인 노트북)
 
-이 과정은 **AI 에이전트를 쓰는 것을 전제로** 합니다. 코드는 어떤 도구로 써도 됩니다.
-평가는 코드가 아니라 **당신의 판단**입니다. 매 Day의 🔮 예측(실행 전), 🧾 검증 기록(체크 후), 📮 제출 카드는 본인이 직접 씁니다.
+설치할 것은 없습니다. **브라우저(Chrome 권장)** 하나로 Colab과 AI 에이전트를 씁니다.
+이 과정은 AI 에이전트 사용을 전제로 하며, 평가는 코드가 아니라 **당신의 판단**입니다.
+🔮 예측(실행 전), 🧾 검증 기록(체크 후), 📮 제출 카드는 본인이 직접 씁니다.
 
-## 1. Colab에서 열기 (기본 경로)
+## 0. 준비물
 
-README의 **Open in Colab** 배지를 누르고 맨 위 `0. 실습 환경 준비` 셀을 실행합니다.
-이 셀이 저장소를 `/content/sonic-vibe-coding-lab`에 받고, 필요한 패키지를 설치하고, 공식 자산(약 125 MB)을 내려받습니다. 처음 1회 1–2분 걸립니다.
+| 계정 | 용도 | 필수 |
+|---|---|---|
+| Google | Colab 실행, Colab의 Gemini | ✅ |
+| GitHub | 웹 코딩 에이전트(C 방식)를 쓸 때 Fork | C 방식만 |
+| Claude(Pro 이상) 또는 ChatGPT(Codex 포함 요금제) | 웹 코딩 에이전트 | C 방식만 |
 
-- **런타임 유형**: CPU로 충분합니다. 정책 추론(ONNX CPU)과 물리 시뮬레이션은 CPU만 씁니다. GPU 런타임은 메쉬 영상 렌더링만 빨라집니다.
-- **런타임이 끊기면** `/content`가 지워집니다. 0번 셀부터 다시 실행하세요.
-- **Day 2 버그 사냥 파일**은 Colab 왼쪽 파일 탐색기에서 `sonic-vibe-coding-lab/exercises/buggy_pipeline.py`를 더블클릭해 편집합니다. 런타임이 끊기면 수정 내용도 사라지므로 수시로 노트북 메모 셀에 복사해 두세요.
+**공용 PC 주의**: Chrome **게스트 창**이나 시크릿 창에서 로그인하고, 수업이 끝나면 Google·GitHub·Claude/ChatGPT에서 모두 **로그아웃**하세요. 비밀번호 저장 팝업은 "저장 안 함".
 
-## 2. AI 도구 연결 — 네 가지 방식
+## 1. Colab에서 노트북 열기 (모두 공통)
 
-### A. 웹 채팅형 (ChatGPT, Claude, Gemini 등)
-1. `docs/01_contract.md` 전문을 대화 첫 메시지에 붙여 넣습니다.
-2. 미션 설명과 함수 시그니처를 붙여 넣고 구현을 요청합니다.
-3. 받은 코드를 `✍️` 셀에 붙여 실행 → 체크 출력을 다시 대화에 붙여 넣습니다.
+1. README의 **Open in Colab** 배지 클릭 → Google 로그인 → 상단 **"Drive에 사본 저장"**(내 기록이 남도록).
+2. 맨 위 `0. 실습 환경 준비` 셀 실행(처음 1–2분). 저장소·패키지·공식 자산(약 125 MB)이 Colab 서버에 준비됩니다.
+3. 런타임 유형은 **CPU**로 충분합니다. 런타임이 끊기면 0번 셀부터 다시 실행합니다.
 
-### B. Colab 내장 AI
-셀의 AI 기능에 미션 설명과 "docs/01_contract.md의 규칙을 따른다"를 함께 적습니다. 계약서 내용을 직접 붙여 주는 편이 정확합니다.
+모든 계산은 Colab 서버에서 하므로 PC 사양이나 운영체제(Windows/macOS)와 상관없습니다.
 
-### C. 에이전트가 Colab 노트북을 직접 조작 — Colab MCP 서버 (선택)
-Google의 [Colab MCP 서버](https://github.com/googlecolab/colab-mcp)를 쓰면 **내 컴퓨터에서 실행 중인 에이전트**(Claude Code, Gemini CLI 등)가 브라우저의 Colab 노트북에 셀을 만들고 실행할 수 있습니다. 클라우드에서 도는 에이전트(웹 채팅 등)는 쓸 수 없습니다.
+## 2. AI 에이전트 — 세 가지 방식 (설치 없음)
 
-1. `uv` 설치: `pip install uv` (서버가 Python 3.13 이상을 요구하지만 `uvx`가 알아서 받습니다)
-2. 첫 실행이 느리므로 미리 한 번 받아 두기: `uvx git+https://github.com/googlecolab/colab-mcp --help`
-3. 에이전트에 등록
-   - Claude Code: `claude mcp add colab-mcp -- uvx git+https://github.com/googlecolab/colab-mcp` → `claude mcp list`로 확인
-   - Codex(공식 호환 목록에 없음, 동작 미보장): `~/.codex/config.toml`에
-     ```toml
-     [mcp_servers.colab-mcp]
-     command = "uvx"
-     args = ["git+https://github.com/googlecolab/colab-mcp"]
-     startup_timeout_sec = 60
-     ```
-4. 에이전트에게 "Colab에 연결해 줘"라고 하면 `open_colab_browser_connection` 도구가 브라우저에 **새 빈 Colab 노트북**을 엽니다. 60초 안에 연결되면 노트북 편집·실행 도구가 나타납니다(한 번에 브라우저 탭 1개만 연결).
-5. ⚠️ 연결되는 곳은 **새 빈 노트북**입니다. 이 과정의 노트북(day1 등)을 바로 조작하지 않습니다. 에이전트에게 Day 노트북의 `0. 실습 환경 준비` 코드를 그 노트북에서 실행하게 한 뒤 미션 코드를 맡기고, 🔮/🧾/📮은 과정 노트북(다른 탭)이나 `templates/`에 본인이 씁니다. 과정 노트북 자체에서 에이전트와 작업하려면 D의 VS Code + Colab 확장이 더 단순합니다.
+### A. Colab의 Gemini — 가장 간단, 노트북 안에서 바로
+Colab 화면 아래쪽 **Gemini(✦) 버튼**으로 대화하면 Gemini가 노트북의 여러 셀을 읽고, 코드를 만들고, 오류를 고칩니다.
+- 처음 지시 예: "이 노트북은 SONIC 실습이다. 저장소의 `docs/01_contract.md` 규칙만 근거로 하고, 🔮/🧾/📮 셀은 절대 작성하지 마."
+- 계약서 내용을 대화에 직접 붙여 주면 더 정확합니다(왼쪽 📁 → `sonic-vibe-coding-lab/docs/01_contract.md`를 열어 복사).
+- 계정 연령·국가에 따라 일부 기능이 보이지 않을 수 있습니다. 그때는 B로.
 
-### D. 에이전트형 도구로 로컬 편집 (Claude Code, Codex, Cursor 등)
-1. 이 저장소를 **Fork** → 로컬에 clone. 에이전트는 `AGENTS.md`/`CLAUDE.md`에서 실습 규칙을 자동으로 읽습니다.
-2. 미션 코드는 `my_work/day1.py`, `day2.py`, `day3.py`에 작성하고, 노트북 `✍️` 셀의 `from my_work.dayN import *` 주석을 해제해 불러옵니다.
-3. 실행은 셋 중 하나
-   - **VS Code + Colab 확장**: Google의 공식 Colab 확장을 설치하면 VS Code에서 연 노트북의 커널로 Colab 런타임을 고를 수 있습니다(`Select Kernel → Colab`).
-   - **Colab 웹**: Fork를 push하고 노트북 0번 셀의 `REPO`를 내 Fork 주소로 바꿔 실행.
-   - **로컬**(Ubuntu 22.04 기준): 아래 conda 환경에서 Jupyter/VS Code로 `notebooks/` 실행. CPU만 쓰므로 그대로 동작합니다.
+### B. 웹 채팅 (ChatGPT, Claude, Gemini) — 어디서나 동작
+1. 다른 탭에서 채팅을 열고 `docs/01_contract.md` 전문을 첫 메시지로 붙여 넣습니다.
+2. 미션 설명과 함수 시그니처를 붙여 넣고 구현을 요청 → 받은 코드를 `✍️` 셀에 붙여 실행 → 체크 출력을 다시 채팅에 붙여 넣습니다.
 
-```bash
-conda env create -f environment.yml
-conda activate sonic-lab
-jupyter lab
-```
-로컬에서 메쉬 영상을 만들려면 `sudo apt-get install -y libosmesa6`(CPU) 또는 NVIDIA 드라이버의 EGL이 필요합니다. 없으면 `skeleton_video()`를 씁니다.
+### C. 웹 코딩 에이전트 (Claude Code on the web, Codex) — 가장 강력, 준비 10분
+에이전트가 **클라우드 컨테이너**에서 내 GitHub Fork를 직접 고치고 테스트까지 돌린 뒤 push합니다. 나는 Colab에서 그 브랜치를 받아 실행·검증합니다.
 
-## 3. 규칙
-- `sonic_lab/reference.py`, `sonic_lab/check.py`에는 정답이 있습니다. 본인도, 에이전트도 열지 않습니다.
+1. 이 저장소를 **Fork** (GitHub 오른쪽 위 Fork 버튼).
+2. 에이전트 환경 준비 — 둘 중 쓰는 것만
+   - **Claude Code on the web** (`claude.ai/code`): 내 Fork를 연결한 뒤 환경(Environment) 설정에서
+     - **Network access → Custom**, "Also include default list…" 체크, Allowed domains에 아래 입력
+       ```text
+       huggingface.co
+       *.huggingface.co
+       *.hf.co
+       media.githubusercontent.com
+       ```
+       (기본 허용 목록에는 Hugging Face가 없어 모델을 받지 못합니다)
+     - **Setup script**: `tools/agent_setup.sh` 내용을 붙여 넣기
+   - **Codex** (`chatgpt.com/codex`): 내 Fork로 환경(Environment)을 만들고 **Setup script**에 `bash tools/agent_setup.sh`.
+     Codex는 setup 단계에서만 인터넷이 열리고 에이전트 단계는 기본으로 막혀 있지만, 이 스크립트가 setup 단계에서 모델을 미리 받아 두므로 그대로 동작합니다.
+3. 에이전트에게 지시 예: "`my_work/day1.py`의 Mission 1-1~1-5를 계약서대로 구현하고, `python -m pytest -q tests`가 통과하는지 확인한 뒤 `day1` 브랜치에 push해. AGENTS.md 규칙을 지켜."
+4. Colab 노트북의 0번 셀에서 `REPO`를 **내 Fork 주소**, `BRANCH`를 에이전트가 push한 브랜치로 바꿔 실행합니다. 이미 실행 중이면 `🔄 최신 코드 받기` 셀을 실행합니다.
+5. `✍️` 셀에서 `from my_work.day1 import *` 주석을 해제하고 ✅ 셀 실행 → 🔮/🧾를 직접 작성.
+
+> Colab MCP 서버(로컬 에이전트가 브라우저 Colab을 조작)는 **내 컴퓨터에 프로그램 설치가 필요**하므로 공용 컴퓨터실에서는 쓰지 않습니다. 개인 노트북에서 쓰려면 [googlecolab/colab-mcp](https://github.com/googlecolab/colab-mcp)를 참고하세요.
+
+## 3. Day 2 버그 파일 편집
+
+- A·B 방식: Colab 왼쪽 📁 → `sonic-vibe-coding-lab/exercises/buggy_pipeline.py` 더블클릭 → 편집 후 저장. 런타임이 끊기면 수정이 사라지므로 수시로 노트북 메모 셀에 복사해 두세요.
+- C 방식: 에이전트가 Fork의 `exercises/buggy_pipeline.py`를 고쳐 push → Colab에서 `🔄 최신 코드 받기`.
+
+## 4. 규칙
+
+- `sonic_lab/reference.py`, `sonic_lab/check.py`에는 정답이 있습니다. 본인도 에이전트도 열지 않습니다.
 - **🔮 예측은 실행 전에, 🧾 검증 기록과 📮 제출 카드는 본인이 직접** 씁니다. 이것이 평가 대상입니다.
 - Day 2의 정답 비교(`check.bughunt`, `check.invariant_tests`)는 Mission 2-3에서만 부릅니다. 호출 횟수가 기록됩니다.
-- 빨리 끝났다면 각 노트북 끝의 🚀 심화 미션으로 넘어갑니다. 정답이 없는 문제가 대부분입니다.
+- 빨리 끝났다면 각 노트북 끝의 🚀 심화 미션으로 넘어갑니다.
+
+## 부록. 개인 Linux/macOS 노트북에서 로컬 실행 (선택)
+
+```bash
+conda env create -f environment.yml && conda activate sonic-lab
+jupyter lab          # notebooks/ 실행. CPU만 사용
+```
+메쉬 영상은 `libosmesa6`(Linux) 등 OpenGL이 필요하며, 없으면 `skeleton_video()`를 씁니다.

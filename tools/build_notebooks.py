@@ -48,13 +48,14 @@ def verify(question):
 
 SETUP = f'''
 #@title 0. 실습 환경 준비 — 처음 한 번 실행 (약 1–2분)
-REPO = "https://github.com/{REPO_SLUG}"   # Fork로 작업하면 내 Fork 주소로 바꾸세요
+REPO = "https://github.com/{REPO_SLUG}"   # 웹 에이전트로 작업하면 내 Fork 주소로 바꾸세요
+BRANCH = "main"                                            # 에이전트가 다른 브랜치에 push했다면 그 브랜치 이름
 import os, sys, subprocess
 from pathlib import Path
 if Path("/content").exists():                              # Google Colab
     LAB_DIR = Path("/content/sonic-vibe-coding-lab")
     if not LAB_DIR.exists():
-        subprocess.run(["git", "clone", "-q", "--depth", "1", REPO, str(LAB_DIR)], check=True)
+        subprocess.run(["git", "clone", "-q", "--depth", "1", "-b", BRANCH, REPO, str(LAB_DIR)], check=True)
     subprocess.run([sys.executable, "-m", "pip", "install", "-q", "-r", str(LAB_DIR / "requirements-colab.txt")], check=True)
 else:                                                      # 로컬 Jupyter / VS Code (저장소 안에서 실행)
     LAB_DIR = Path.cwd().parent if Path.cwd().name == "notebooks" else Path.cwd()
@@ -66,9 +67,18 @@ from sonic_lab import check, reference as ref, render, analysis
 lab = sonic_lab.start()
 '''
 
+UPDATE = '''
+#@title 🔄 (웹 에이전트 사용자) 에이전트가 Fork에 push한 최신 코드 받기 — 필요할 때만
+r = subprocess.run(["git", "-C", str(LAB_DIR), "pull", "--ff-only", "origin", BRANCH], capture_output=True, text=True)
+print(r.stdout or r.stderr)
+for name in [m for m in sys.modules if m.startswith("my_work")]:
+    del sys.modules[name]                                  # 다음 import에서 새 코드를 읽도록
+print("완료 — my_work 코드를 쓰는 ✍️ 셀을 다시 실행하세요")
+'''
+
 AGENT_POLICY = """
 **AI 사용 규칙 (이 과정은 AI 에이전트 사용을 전제로 합니다)**
-- 코드는 어떤 도구로 써도 됩니다. Colab MCP·VS Code 확장으로 에이전트가 노트북을 직접 실행해도 됩니다(`docs/00_setup.md`).
+- 코드는 어떤 도구로 써도 됩니다: Colab의 Gemini, 웹 채팅(ChatGPT·Claude·Gemini), 웹 코딩 에이전트(Claude Code on the web, Codex) — 설치 없이 브라우저만으로 (`docs/00_setup.md`).
 - 대신 **평가는 코드가 아니라 당신의 판단**입니다: 🔮 예측(실행 전), 🧾 검증 기록(체크 후), 마지막 📮 제출 카드는 **본인이 직접** 씁니다.
 - `sonic_lab/reference.py`·`check.py`는 정답입니다. 에이전트에게도 읽지 말라고 지시하세요(`AGENTS.md`에 규칙이 있음).
 """
@@ -110,6 +120,7 @@ def day1():
 ⚠️ 이 실습의 어떤 출력도 실물 로봇에 보내지 않습니다.
 """),
         code(SETUP, hidden=True),
+        code(UPDATE, hidden=True),
         md("""
 ## 목적지 미리보기 (5분)
 참조 구현으로 3일 뒤 도달할 결과를 먼저 봅니다: **사람 걷기 데이터 → SONIC → MuJoCo G1**.
@@ -311,6 +322,7 @@ def day2():
 - 오늘은 추가로: `check.bughunt`·`check.invariant_tests`(정답 비교)는 **Mission 2-3 전에는 부르지 않습니다.** 호출 횟수가 기록되어 제출 카드에 함께 남습니다.
 """),
         code(SETUP, hidden=True),
+        code(UPDATE, hidden=True),
         code('''
 # 버그 사냥 대상 불러오기 — 파일을 고칠 때마다 이 셀부터 다시 실행
 import importlib.util
@@ -459,6 +471,7 @@ def day3():
 - 오늘은 추가로: 실험 카드의 **가설은 코드를 돌리기 전에 본인이** 씁니다. 해석·한계도 본인 판단으로 씁니다(AI 의견은 참고만).
 """),
         code(SETUP, hidden=True),
+        code(UPDATE, hidden=True),
         md("""
 ---
 ## Mission 3-1 · 기준 실험 3조건 (25분)
