@@ -65,7 +65,7 @@ def plot(results: dict, lab=None):
             axes[1].plot(t, err, label=label)
     axes[0].axhline(.35, color="#c2410c", ls="--", lw=1)
     axes[0].set(title="pelvis height (m) — 0.35 m 아래면 넘어짐 판정", xlabel="time (s)")
-    axes[1].set(title="mean |joint − reference| (deg)", xlabel="time (s)")
+    axes[1].set(title="mean |joint - reference| (deg)", xlabel="time (s)")
     for ax in axes:
         ax.legend(fontsize=8)
     return fig
