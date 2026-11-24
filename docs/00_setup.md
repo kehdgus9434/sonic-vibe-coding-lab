@@ -34,33 +34,16 @@ Colab 화면 아래쪽 **Gemini(✦) 버튼**으로 대화하면 Gemini가 노�
 1. 다른 탭에서 채팅을 열고 `docs/01_contract.md` 전문을 첫 메시지로 붙여 넣습니다.
 2. 미션 설명과 함수 시그니처를 붙여 넣고 구현을 요청 → 받은 코드를 `✍️` 셀에 붙여 실행 → 체크 출력을 다시 채팅에 붙여 넣습니다.
 
-### C. 웹 코딩 에이전트 (Claude Code on the web, Codex) — 가장 강력, 준비 10분
-에이전트가 **클라우드 컨테이너**에서 내 GitHub Fork를 직접 고치고 테스트까지 돌린 뒤 push합니다. 나는 Colab에서 그 브랜치를 받아 실행·검증합니다.
-
-1. 이 저장소를 **Fork** (GitHub 오른쪽 위 Fork 버튼).
-2. 에이전트 환경 준비 — 둘 중 쓰는 것만
-   - **Claude Code on the web** (`claude.ai/code`): 내 Fork를 연결한 뒤 환경(Environment) 설정에서
-     - **Network access → Custom**, "Also include default list…" 체크, Allowed domains에 아래 입력
-       ```text
-       huggingface.co
-       *.huggingface.co
-       *.hf.co
-       media.githubusercontent.com
-       ```
-       (기본 허용 목록에는 Hugging Face가 없어 모델을 받지 못합니다)
-     - **Setup script**: `tools/agent_setup.sh` 내용을 붙여 넣기
-   - **Codex** (`chatgpt.com/codex`): 내 Fork로 환경(Environment)을 만들고 **Setup script**에 `bash tools/agent_setup.sh`.
-     Codex는 setup 단계에서만 인터넷이 열리고 에이전트 단계는 기본으로 막혀 있지만, 이 스크립트가 setup 단계에서 모델을 미리 받아 두므로 그대로 동작합니다.
-3. 에이전트에게 지시 예: "`my_work/day1.py`의 Mission 1-1~1-5를 계약서대로 구현하고, `python -m pytest -q tests`가 통과하는지 확인한 뒤 `day1` 브랜치에 push해. AGENTS.md 규칙을 지켜."
-4. Colab 노트북의 0번 셀에서 `REPO`를 **내 Fork 주소**, `BRANCH`를 에이전트가 push한 브랜치로 바꿔 실행합니다. 이미 실행 중이면 `🔄 최신 코드 받기` 셀을 실행합니다.
-5. `✍️` 셀에서 `from my_work.day1 import *` 주석을 해제하고 ✅ 셀 실행 → 🔮/🧾를 직접 작성.
+### C. 웹 코딩 에이전트 + GitHub 자동 리포트 (Claude Code on the web, Codex) — 가장 강력, 준비 10분
+에이전트가 내 GitHub Fork의 브랜치에 코드를 push하면, GitHub이 **실제 모델로 자동 실행**해서 체크 표·그래프·로봇 GIF를 PR 댓글로 보여 주고,
+**"Colab에서 내 브랜치로 열기"** 링크(REPO/BRANCH가 채워진 노트북)를 줍니다. 자세한 흐름: [`docs/04_web_agent_workflow.md`](04_web_agent_workflow.md)
 
 > Colab MCP 서버(로컬 에이전트가 브라우저 Colab을 조작)는 **내 컴퓨터에 프로그램 설치가 필요**하므로 공용 컴퓨터실에서는 쓰지 않습니다. 개인 노트북에서 쓰려면 [googlecolab/colab-mcp](https://github.com/googlecolab/colab-mcp)를 참고하세요.
 
 ## 3. Day 2 버그 파일 편집
 
 - A·B 방식: Colab 왼쪽 📁 → `sonic-vibe-coding-lab/exercises/buggy_pipeline.py` 더블클릭 → 편집 후 저장. 런타임이 끊기면 수정이 사라지므로 수시로 노트북 메모 셀에 복사해 두세요.
-- C 방식: 에이전트가 Fork의 `exercises/buggy_pipeline.py`를 고쳐 push → Colab에서 `🔄 최신 코드 받기`.
+- C 방식: 에이전트가 Fork의 `exercises/buggy_pipeline.py`를 고쳐 push → 자동 리포트 확인 → 리포트의 Colab 링크(또는 실행 중이면 `🔄 최신 코드 받기`).
 
 ## 4. 규칙
 

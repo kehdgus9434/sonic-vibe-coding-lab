@@ -17,7 +17,7 @@ NVIDIA **GEAR-SONIC** 공개 모델(사람/로봇 모션 → 64차원 토큰 →
 |---|---|---|---|
 | **Day 1** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kehdgus9434/sonic-vibe-coding-lab/blob/main/notebooks/day1_anatomy.ipynb) `day1_anatomy` | 모델과 데이터의 '계약'을 AI와 함께 정확히 읽을 수 있나? | 내가 만든 Encoder 입력 → 토큰 |
 | **Day 2** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kehdgus9434/sonic-vibe-coding-lab/blob/main/notebooks/day2_bughunt.ipynb) `day2_bughunt` | 정답 코드 없이 버그를 잡을 수 있나? (테스트 먼저 → 수정 → 마지막에 정답 비교) | 불변식 테스트 + 버그 4개 수정 + 40초 완주 |
-| **Day 3** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kehdgus9434/sonic-vibe-coding-lab/blob/main/notebooks/day3_experiment.ipynb) `day3_experiment` | 기준 조건 위에서 나만의 질문을 실험할 수 있나? | 실험 1개 + 3분 발표 |
+| **Day 3** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kehdgus9434/sonic-vibe-coding-lab/blob/main/notebooks/day3_experiment.ipynb) `day3_experiment` | 기준 조건 위에서 나만의 질문을 실험할 수 있나? | 실험 1개 + 결과 영상 |
 
 각 노트북 맨 위 `0. 실습 환경 준비` 셀만 실행하면 저장소·패키지·공식 자산(약 125 MB)이 자동으로 준비됩니다. 빨리 끝난 사람을 위해 각 노트북 끝에 🚀 심화 미션(대부분 정답 없음)이 있습니다.
 
@@ -29,6 +29,7 @@ NVIDIA **GEAR-SONIC** 공개 모델(사람/로봇 모션 → 64차원 토큰 →
 | [`docs/01_contract.md`](docs/01_contract.md) | **입출력 계약서** — AI 코드가 맞는지 판단하는 유일한 기준. 바이브 코딩 도구에 통째로 넣으세요 |
 | [`docs/02_vibe_coding_guide.md`](docs/02_vibe_coding_guide.md) | 연구 코드 바이브 코딩 원칙, 프롬프트 템플릿, 이 자료가 만들어진 실제 과정(01→08) |
 | [`docs/03_checklist.md`](docs/03_checklist.md) | AI가 만든 연구 코드 검증 체크리스트 |
+| [`docs/04_web_agent_workflow.md`](docs/04_web_agent_workflow.md) | 웹 코딩 에이전트(Claude Code on the web·Codex) → push → **GitHub이 실제 모델로 자동 실행해 PR 댓글로 결과(표·그래프·로봇 GIF)와 Colab 링크 제공** |
 
 ## 저장소 구조
 
@@ -37,13 +38,13 @@ notebooks/            Day 1–3 실습 노트북 (Colab)
 docs/                 계약서 · 가이드 · 체크리스트
 exercises/            Day 2 버그 사냥 대상 (buggy_pipeline.py)
 my_work/              에이전트형 도구 사용자의 미션 작성 파일
-templates/            프롬프트 로그 · 발표 템플릿
+templates/            프롬프트 로그
 sonic_lab/            실습 지원 패키지 (자산 다운로드, 참조 구현, 체크포인트, 렌더링)
   ├─ reference.py     ⚠️ 정답 구현 — 실습 중에는 열지 않기
   └─ check.py         ⚠️ 채점 로직 — 실습 중에는 열지 않기
 AGENTS.md, CLAUDE.md  에이전트형 도구가 자동으로 읽는 실습 규칙
 tests/                관리자용 오프라인 테스트 (가짜 모델)
-tools/                노트북 생성기, 저장소 주소 변경(set_repo.py), 실제 모델 점검, 웹 에이전트 환경 준비(agent_setup.sh)
+tools/                노트북 생성기, 학생 자동 리포트(student_report.py), 실제 모델 점검, 웹 에이전트 환경 준비(agent_setup.sh)
 ```
 
 ## 관리

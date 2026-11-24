@@ -48,8 +48,9 @@ def verify(question):
 
 SETUP = f'''
 #@title 0. 실습 환경 준비 — 처음 한 번 실행 (약 1–2분)
-REPO = "https://github.com/{REPO_SLUG}"   # 웹 에이전트로 작업하면 내 Fork 주소로 바꾸세요
-BRANCH = "main"                                            # 에이전트가 다른 브랜치에 push했다면 그 브랜치 이름
+REPO = "https://github.com/{REPO_SLUG}"  #@param {{type:"string"}}
+BRANCH = "main"  #@param {{type:"string"}}
+# 웹 코딩 에이전트 사용자: PR 댓글의 "Colab에서 내 브랜치로 열기" 링크를 쓰면 이 두 값이 자동으로 채워집니다
 import os, sys, subprocess
 from pathlib import Path
 if Path("/content").exists():                              # Google Colab
@@ -453,19 +454,18 @@ render.show(video or render.skeleton_video(lab, fixed[1], "outputs/day2_fixed_sk
 def day3():
     name = "day3_experiment.ipynb"
     cells = [md(f"""
-# Day 3 · 실험 설계와 발표 — 기준 조건 위에서 질문하기
+# Day 3 · 실험 설계 — 기준 조건 위에서 질문하기
 {badge(name)}
 
-**오늘의 결과물**: 기준 실험 표 + 나만의 실험 1개(가설·지표·결과·한계) + 3분 발표 + 제출 카드
+**오늘의 결과물**: 기준 실험 표 + 나만의 실험 1개(가설·지표·결과·한계) + 결과 영상 + 제출 카드
 
 | 시간 | 내용 |
 |---|---|
 | 0:00–0:10 | 환경 준비 · 기준/통제 조건이란 |
 | 0:10–0:35 | Mission 3-1 기준 실험 3조건 + 지표 추가 |
-| 0:35–1:20 | Mission 3-2 자유 실험 |
-| 1:20–1:30 | Mission 3-3 결과 영상 |
-| 1:30–1:55 | 발표 (1인/1조 3분) |
-| 1:55–2:00 | 📮 제출 카드 |
+| 0:35–1:35 | Mission 3-2 자유 실험 |
+| 1:35–1:45 | Mission 3-3 결과 영상 |
+| 1:45–2:00 | 📮 제출 카드 · 검증 체크리스트 · (빨리 끝나면 🚀 심화) |
 
 {AGENT_POLICY}
 - 오늘은 추가로: 실험 카드의 **가설은 코드를 돌리기 전에 본인이** 씁니다. 해석·한계도 본인 판단으로 씁니다(AI 의견은 참고만).
@@ -502,13 +502,15 @@ def joint_error_by_group(arrays, lab):
     """반환 예: {"legs": 3.1, "waist": 1.2, "arms": 7.8}"""
     raise NotImplementedError
 
+# from my_work.day3 import *
+
 for label in ["cond:0", "cond:2"]:
     print(label, joint_error_by_group(baseline[label][1], lab))
 '''),
         verify("예측과 실제가 달랐다면 무엇이 달랐나요? 부위별 오차에서 모드 2가 특히 나쁜 부위가 있다면, 입력 데이터의 어떤 한계와 관련 있을까요?"),
         md("""
 ---
-## Mission 3-2 · 자유 실험 (45분)
+## Mission 3-2 · 자유 실험 (60분)
 아래에서 하나를 고르거나 직접 제안하세요. **실험 카드의 가설을 먼저 채우고** 코드를 작성합니다.
 
 | 카드 | 질문 | 힌트 |
@@ -535,12 +537,17 @@ card3 = {
 }
 '''),
         code('''
-# ✍️ Mission 3-2 — 실험 코드
+# ✍️ Mission 3-2 — 실험 코드 (웹 코딩 에이전트 사용자는 my_work/day3.py의 experiment()에 작성)
 import dataclasses
-results = {"기준(mode 2)": ref.run_physics(lab.sim, lab.policy, lab.motion, mode=2, max_frames=N)}
 
-# results["내 조건"] = ...
+def experiment(lab, N=1000):
+    """반환: {"라벨": run_physics 결과(summary, arrays), ...} — 첫 항목은 기준 조건"""
+    results = {"기준(mode 2)": ref.run_physics(lab.sim, lab.policy, lab.motion, mode=2, max_frames=N)}
+    # results["내 조건"] = ...
+    return results
 
+# from my_work.day3 import *
+results = experiment(lab, N)
 display(analysis.table(results))
 analysis.plot(results, lab);
 '''),
@@ -551,7 +558,7 @@ check.experiment_card(card3)
         md("""
 ---
 ## Mission 3-3 · 결과 영상 (10분)
-발표에 쓸 6초 영상을 만듭니다. 영상은 *보여주기*일 뿐, 판단은 표의 수치로 합니다.
+실험 결과를 눈으로 확인할 6초 영상을 만듭니다. 영상은 *보여주기*일 뿐, 판단은 표의 수치로 합니다.
 """),
         code('''
 label = list(results)[-1]
@@ -560,10 +567,8 @@ render.show(video or render.skeleton_video(lab, results[label][1], "outputs/day3
 '''),
         md("""
 ---
-## 발표 (3분) — `templates/presentation.md`
-1. 질문과 **실행 전 가설** → 2. 기준 vs 내 조건 (표 1개 + 그림/영상 1개) → 3. 해석과 한계 → 4. AI가 틀렸던 순간 1개
-
-## 📮 제출 카드와 마무리 — `docs/03_checklist.md`
+## 📮 제출 카드와 마무리 (15분)
+제출 전에 `docs/03_checklist.md`로 내 실험 결과를 점검하세요. 채울 수 없는 항목이 다음 연구의 첫 번째 할 일입니다.
 """),
         code(REFLECTION),
         md("""

@@ -164,7 +164,7 @@ tau = clip(tau, actuator_ctrlrange)                                # scene_43dof
 `default`, `scale(g1_action_scale)`, `kp(kps)`, `kd(kds)`는 모두 `policy_parameters.hpp`(MuJoCo 순서)에서 읽습니다.
 MuJoCo Menagerie의 위치 액추에이터 모델을 쓰면 이 계약이 깨집니다(07번 노트북에서 교체한 이유).
 
-## 6. 알려진 한계 (발표 때 반드시 언급)
+## 6. 알려진 한계 (결과를 해석할 때 반드시 고려)
 
 - 이 실습의 물리 루프는 공식 C++/TensorRT 배포 스택이 아니라 Python 재구현입니다. 완주 = "지정 구간을 넘어지지 않고 실행"이며 **동작 품질 검증이 아닙니다**.
 - 이 저장소 코드의 실제 모델 결과(GitHub Actions `real-model-check`, 원본 07번 노트북의 Colab 기록과 동일): 공식 샘플 모드 0·모드 2는 2002/2002 프레임 완주(참조 대비 관절 RMSE 각각 약 5.1°·6.1°), 정책 없는 참조 PD 재생은 55프레임에서 넘어짐.
