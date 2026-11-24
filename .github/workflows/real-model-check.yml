@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-python@v6
         with: {python-version: "3.12"}
       - name: System packages (Colab CPU 런타임과 같은 소프트웨어 렌더러)
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq libosmesa6 ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libosmesa6 ffmpeg fonts-nanum
       - name: Python packages (Colab 기본 패키지 + requirements-colab.txt)
         run: pip install -q -r requirements-colab.txt numpy scipy pandas matplotlib pyyaml joblib imageio pillow nbclient nbformat ipykernel
       - run: python -m ipykernel install --user --name python3

@@ -18,9 +18,41 @@ def table(results: dict):
     return df.round(3)
 
 
+_FONT_READY = False
+
+
+def korean_font():
+    """그래프의 한글이 □로 깨지지 않게 한글 글꼴을 설정합니다(없으면 Colab/CI에서 fonts-nanum 설치 시도)."""
+    global _FONT_READY
+    if _FONT_READY:
+        return
+    import os
+    import shutil
+    import subprocess
+    from matplotlib import font_manager, rcParams
+    wanted = ("NanumGothic", "Noto Sans CJK KR", "Noto Sans KR", "Malgun Gothic", "AppleGothic", "Noto Sans CJK JP")
+
+    def find():
+        names = {f.name for f in font_manager.fontManager.ttflist}
+        return next((w for w in wanted if w in names), None)
+
+    name = find()
+    if name is None and shutil.which("apt-get") and hasattr(os, "geteuid") and os.geteuid() == 0:
+        subprocess.run(["apt-get", "install", "-y", "-qq", "fonts-nanum"], capture_output=True)
+        for path in font_manager.findSystemFonts():
+            if "Nanum" in path:
+                font_manager.fontManager.addfont(path)
+        name = find()
+    if name:
+        rcParams["font.family"] = name
+    rcParams["axes.unicode_minus"] = False
+    _FONT_READY = True
+
+
 def plot(results: dict, lab=None):
     """골반 높이와 (참조가 있으면) 관절 오차 시계열."""
     import matplotlib.pyplot as plt
+    korean_font()
     fig, axes = plt.subplots(1, 2, figsize=(12, 3.6), layout="constrained")
     for label, (summary, arrays) in results.items():
         if not len(arrays["qpos"]):
