@@ -25,3 +25,8 @@ def resample_g1(robot_record, human_record, hz=50):
 def build_encoder_obs_mode2(motion, frame, robot_xyzw, alignment):
     """Mission 1-5: Mode-2 encoder 입력 (1762,) float32"""
     raise NotImplementedError
+
+
+def build_encoder_obs_mode0(motion, frame, robot_xyzw, alignment):
+    """🚀 심화 A: Mode-0 (G1 참조) encoder 입력 (1762,) float32"""
+    raise NotImplementedError

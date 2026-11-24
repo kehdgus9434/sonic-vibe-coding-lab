@@ -6,7 +6,8 @@ NVIDIA **GEAR-SONIC** 공개 모델(사람/로봇 모션 → 64차원 토큰 →
 **AI 코딩 도구가 만든 연구 코드를 어떻게 믿을 수 있게 만드는지** 3일(2시간 × 3회) 동안 실습합니다.
 
 - 대상: 코딩 경험이 있는 대학원생 · 이론 강의 최소화 · 과제 없음
-- 바이브 코딩 도구: **자유** (ChatGPT·Claude·Gemini 웹, Colab 내장 AI, Claude Code·Codex·Cursor 등)
+- AI 도구: **자유, 에이전트 사용 전제** (웹 채팅, Colab 내장 AI, Colab MCP로 노트북을 직접 조작하는 Claude Code 등, VS Code + Colab 확장)
+- 평가: 코드가 아니라 **판단** — 실행 전 🔮 예측, 체크 후 🧾 검증 기록, 매 Day 📮 제출 카드 (본인 작성)
 - 실행 환경: **Google Colab CPU 런타임**으로 충분 (GPU는 영상 렌더링만 빨라짐)
 
 ## 3일 구성
@@ -14,10 +15,10 @@ NVIDIA **GEAR-SONIC** 공개 모델(사람/로봇 모션 → 64차원 토큰 →
 | | 노트북 | 핵심 질문 | 결과물 |
 |---|---|---|---|
 | **Day 1** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kehdgus9434/sonic-vibe-coding-lab/blob/main/notebooks/day1_anatomy.ipynb) `day1_anatomy` | 모델과 데이터의 '계약'을 AI와 함께 정확히 읽을 수 있나? | 내가 만든 Encoder 입력 → 토큰 |
-| **Day 2** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kehdgus9434/sonic-vibe-coding-lab/blob/main/notebooks/day2_bughunt.ipynb) `day2_bughunt` | 에러 없이 돌아가는데 로봇이 넘어진다. 왜? | 버그 4개 수정 + 불변식 테스트 + 40초 완주 |
+| **Day 2** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kehdgus9434/sonic-vibe-coding-lab/blob/main/notebooks/day2_bughunt.ipynb) `day2_bughunt` | 정답 코드 없이 버그를 잡을 수 있나? (테스트 먼저 → 수정 → 마지막에 정답 비교) | 불변식 테스트 + 버그 4개 수정 + 40초 완주 |
 | **Day 3** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kehdgus9434/sonic-vibe-coding-lab/blob/main/notebooks/day3_experiment.ipynb) `day3_experiment` | 기준 조건 위에서 나만의 질문을 실험할 수 있나? | 실험 1개 + 3분 발표 |
 
-각 노트북 맨 위 `0. 실습 환경 준비` 셀만 실행하면 저장소·패키지·공식 자산(약 100 MB)이 자동으로 준비됩니다.
+각 노트북 맨 위 `0. 실습 환경 준비` 셀만 실행하면 저장소·패키지·공식 자산(약 125 MB)이 자동으로 준비됩니다. 빨리 끝난 사람을 위해 각 노트북 끝에 🚀 심화 미션(대부분 정답 없음)이 있습니다.
 
 ## 먼저 읽을 문서
 

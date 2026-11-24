@@ -66,3 +66,21 @@ def test_run_physics_modes(lab):
 def test_mirrored_sample_loads(lab):
     m = lab.load_motion(mirrored=True)
     assert m.local24.shape[1:] == (24, 3)
+
+
+def test_mode0_check_and_reflection(lab):
+    from sonic_lab import check
+    assert check.encoder_obs_mode0(lab, lambda m, f, r, a: lab.policy.encoder_obs(m, f, r, a, 0))
+    assert not check.encoder_obs_mode0(lab, lambda m, f, r, a: lab.policy.encoder_obs(m, f, r, a, 2))
+    assert not check.reflection({})
+    assert check.reflection({k: "충분히 긴 답변" for k in check.REFLECTION_KEYS})
+
+
+def test_oracle_calls_are_counted(lab):
+    from sonic_lab import check, reference as ref
+    before = check.ORACLE_CALLS.get("invariant_tests", 0)
+
+    def tests(p, lab):
+        raise AssertionError("always")
+    check.invariant_tests(lab, tests)
+    assert check.ORACLE_CALLS["invariant_tests"] == before + 1

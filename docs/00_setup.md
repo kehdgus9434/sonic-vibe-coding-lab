@@ -1,40 +1,65 @@
 # 시작하기
 
+이 과정은 **AI 에이전트를 쓰는 것을 전제로** 합니다. 코드는 어떤 도구로 써도 됩니다.
+평가는 코드가 아니라 **당신의 판단**입니다. 매 Day의 🔮 예측(실행 전), 🧾 검증 기록(체크 후), 📮 제출 카드는 본인이 직접 씁니다.
+
 ## 1. Colab에서 열기 (기본 경로)
 
 README의 **Open in Colab** 배지를 누르고 맨 위 `0. 실습 환경 준비` 셀을 실행합니다.
-이 셀이 저장소를 `/content/sonic-vibe-coding-lab`에 받고, 필요한 패키지를 설치하고, 공식 자산(약 100 MB)을 내려받습니다. 처음 1회 1–2분 걸립니다.
+이 셀이 저장소를 `/content/sonic-vibe-coding-lab`에 받고, 필요한 패키지를 설치하고, 공식 자산(약 125 MB)을 내려받습니다. 처음 1회 1–2분 걸립니다.
 
-- **런타임 유형**: CPU로 충분합니다. 정책 추론(ONNX CPU)과 물리 시뮬레이션은 CPU만 씁니다. GPU 런타임은 Day 3 메쉬 영상 렌더링만 빨라집니다.
-- **런타임이 끊기면** `/content`가 지워집니다. 0번 셀부터 다시 실행하세요(자산은 다시 받음).
-- **Day 2 버그 사냥 파일**은 Colab 왼쪽 파일 탐색기에서 `sonic-vibe-coding-lab/exercises/buggy_pipeline.py`를 더블클릭해 편집합니다. 런타임이 끊기면 수정 내용도 사라지므로, 중간중간 노트북 셀에 복사해 두세요.
+- **런타임 유형**: CPU로 충분합니다. 정책 추론(ONNX CPU)과 물리 시뮬레이션은 CPU만 씁니다. GPU 런타임은 메쉬 영상 렌더링만 빨라집니다.
+- **런타임이 끊기면** `/content`가 지워집니다. 0번 셀부터 다시 실행하세요.
+- **Day 2 버그 사냥 파일**은 Colab 왼쪽 파일 탐색기에서 `sonic-vibe-coding-lab/exercises/buggy_pipeline.py`를 더블클릭해 편집합니다. 런타임이 끊기면 수정 내용도 사라지므로 수시로 노트북 메모 셀에 복사해 두세요.
 
-## 2. 바이브 코딩 도구 연결 — 세 가지 방식
+## 2. AI 도구 연결 — 네 가지 방식
 
 ### A. 웹 채팅형 (ChatGPT, Claude, Gemini 등)
 1. `docs/01_contract.md` 전문을 대화 첫 메시지에 붙여 넣습니다.
-2. 미션 셀의 설명과 함수 시그니처를 붙여 넣고 구현을 요청합니다.
-3. 받은 코드를 `✍️` 셀에 붙여 실행 → 체크 셀 출력을 다시 대화에 붙여 넣습니다.
+2. 미션 설명과 함수 시그니처를 붙여 넣고 구현을 요청합니다.
+3. 받은 코드를 `✍️` 셀에 붙여 실행 → 체크 출력을 다시 대화에 붙여 넣습니다.
 
 ### B. Colab 내장 AI
 셀의 AI 기능에 미션 설명과 "docs/01_contract.md의 규칙을 따른다"를 함께 적습니다. 계약서 내용을 직접 붙여 주는 편이 정확합니다.
 
-### C. 에이전트형 (Claude Code, Codex, Cursor 등) — 로컬 편집
-1. 이 저장소를 **Fork** → 로컬에 clone.
-2. 에이전트는 저장소의 `AGENTS.md`/`CLAUDE.md`에서 규칙을 읽습니다(정답 파일을 읽지 않기 등).
-3. 미션 코드는 `my_work/day1.py`, `day2.py`, `day3.py`에 작성합니다. 노트북의 `✍️` 셀에서 `from my_work.day1 import *` 줄의 주석을 해제하면 불러옵니다.
-4. 실행 방법 둘 중 하나
-   - **Colab**: Fork를 push하고, 노트북 0번 셀의 `REPO`를 내 Fork 주소로 바꿔 실행.
-   - **로컬**(Ubuntu 22.04 기준): 아래 conda 환경에서 Jupyter/VS Code로 `notebooks/`를 실행. 코드가 CPU만 쓰므로 그대로 동작합니다.
+### C. 에이전트가 Colab 노트북을 직접 조작 — Colab MCP 서버
+Google이 공개한 [Colab MCP 서버](https://github.com/googlecolab/colab-mcp)를 쓰면 **내 컴퓨터에서 실행 중인 에이전트**(Claude Code, Gemini CLI 등)가 브라우저에 열린 Colab 노트북의 셀을 만들고 실행할 수 있습니다.
+
+필요한 것: Python, git, `uv`(`pip install uv`). 에이전트의 MCP 설정에 아래 서버를 추가한 뒤 에이전트를 다시 시작하고, 브라우저에서 노트북을 연 상태로 작업을 지시합니다.
+
+```json
+{
+  "mcpServers": {
+    "colab-proxy-mcp": {
+      "command": "uvx",
+      "args": ["git+https://github.com/googlecolab/colab-mcp"],
+      "timeout": 30000
+    }
+  }
+}
+```
+
+- Claude Code: `claude mcp add colab-proxy-mcp -- uvx git+https://github.com/googlecolab/colab-mcp`
+- Codex는 공식 호환 목록에 없어 동작을 보장하지 않습니다. 쓰려면 수업 전에 직접 확인하세요.
+- 에이전트에게 처음 줄 지시 예: "이 노트북은 sonic-vibe-coding-lab 실습이다. 저장소의 AGENTS.md 규칙을 따르고, 🔮/🧾/📮 셀은 절대 작성하지 마라."
+
+### D. 에이전트형 도구로 로컬 편집 (Claude Code, Codex, Cursor 등)
+1. 이 저장소를 **Fork** → 로컬에 clone. 에이전트는 `AGENTS.md`/`CLAUDE.md`에서 실습 규칙을 자동으로 읽습니다.
+2. 미션 코드는 `my_work/day1.py`, `day2.py`, `day3.py`에 작성하고, 노트북 `✍️` 셀의 `from my_work.dayN import *` 주석을 해제해 불러옵니다.
+3. 실행은 셋 중 하나
+   - **VS Code + Colab 확장**: Google의 공식 Colab 확장을 설치하면 VS Code에서 연 노트북의 커널로 Colab 런타임을 고를 수 있습니다(`Select Kernel → Colab`).
+   - **Colab 웹**: Fork를 push하고 노트북 0번 셀의 `REPO`를 내 Fork 주소로 바꿔 실행.
+   - **로컬**(Ubuntu 22.04 기준): 아래 conda 환경에서 Jupyter/VS Code로 `notebooks/` 실행. CPU만 쓰므로 그대로 동작합니다.
 
 ```bash
 conda env create -f environment.yml
 conda activate sonic-lab
-jupyter lab        # 또는 VS Code에서 notebooks/*.ipynb 열고 커널 sonic-lab 선택
+jupyter lab
 ```
-메쉬 영상 렌더링을 로컬에서 하려면 `sudo apt-get install -y libosmesa6`(CPU) 또는 NVIDIA 드라이버의 EGL이 필요합니다. 없으면 `skeleton_video()`를 쓰면 됩니다.
+로컬에서 메쉬 영상을 만들려면 `sudo apt-get install -y libosmesa6`(CPU) 또는 NVIDIA 드라이버의 EGL이 필요합니다. 없으면 `skeleton_video()`를 씁니다.
 
 ## 3. 규칙
-- `sonic_lab/reference.py`, `sonic_lab/check.py`에는 정답이 있습니다. 열지 않습니다.
-- 체크 셀이 ❌여도 괜찮습니다. 메시지를 근거로 AI와 원인을 좁혀 가는 과정이 실습입니다.
-- 막히면 강사가 `lab.policy` 등 참조 객체로 우회하는 방법을 알려 줍니다. 다음 미션은 참조 구현으로 이어서 진행할 수 있게 설계되어 있습니다.
+- `sonic_lab/reference.py`, `sonic_lab/check.py`에는 정답이 있습니다. 본인도, 에이전트도 열지 않습니다.
+- **🔮 예측은 실행 전에, 🧾 검증 기록과 📮 제출 카드는 본인이 직접** 씁니다. 이것이 평가 대상입니다.
+- Day 2의 정답 비교(`check.bughunt`, `check.invariant_tests`)는 Mission 2-3에서만 부릅니다. 호출 횟수가 기록됩니다.
+- 빨리 끝났다면 각 노트북 끝의 🚀 심화 미션으로 넘어갑니다. 정답이 없는 문제가 대부분입니다.

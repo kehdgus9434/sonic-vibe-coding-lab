@@ -15,6 +15,12 @@ from scipy.spatial.transform import Rotation as R
 from . import reference as ref
 
 OK, NG = "✅", "❌"
+ORACLE_CALLS = {}   # Day 2: 정답 비교(오라클) 호출 횟수 — 제출 카드에 함께 기록됩니다
+
+
+def _count(name):
+    ORACLE_CALLS[name] = ORACLE_CALLS.get(name, 0) + 1
+    print(f"🔎 정답 비교 '{name}' {ORACLE_CALLS[name]}회째")
 
 
 def _say(ok, title, detail=""):
@@ -112,6 +118,24 @@ def encoder_obs(lab, fn, frames=(0, 137, 1000, 1995), seed=0):
     return _say(ok, "Mission 1-5 Mode-2 Encoder 입력 1762차원")
 
 
+def encoder_obs_mode0(lab, fn, frames=(0, 137, 1000, 1995), seed=4):
+    """[심화] fn(motion, frame, robot_xyzw, alignment) -> (1762,) Mode-0(G1 참조) encoder 입력."""
+    rng = np.random.default_rng(seed)
+    ok = True
+    for frame in frames:
+        robot = _random_pose(rng)
+        alignment = R.from_euler("z", rng.uniform(-np.pi, np.pi))
+        expected = lab.policy.encoder_obs(lab.motion, frame, robot, alignment, mode=0)
+        got = _as_vec(fn(lab.motion, frame, robot, alignment))
+        if got.shape != expected.shape:
+            return _say(False, "심화 Mode-0 Encoder 입력", f"길이 {got.size} ≠ 1762")
+        for name, sl in lab.contract.enc_slices.items():
+            detail = _diagnose(got[sl], expected[sl])
+            if detail:
+                ok = _say(False, f"  frame {frame} · {name}", detail)
+    return _say(ok, "심화 Mode-0 Encoder 입력 1762차원")
+
+
 # ---------------------------------------------------------------------------
 # Day 2
 # ---------------------------------------------------------------------------
@@ -182,7 +206,11 @@ def observation(lab, fn, seed=3, trials=4):
 
 
 def bughunt(lab, pipeline, frames=250):
-    """exercises/buggy_pipeline.py의 Pipeline을 검사하고 짧은 폐루프를 실행합니다."""
+    """[오라클] exercises/buggy_pipeline.py의 Pipeline을 정답과 비교하고 짧은 폐루프를 실행합니다.
+
+    Day 2에서는 Mission 2-3(최종 판정)에서만 사용합니다. 호출 횟수는 기록됩니다.
+    """
+    _count("bughunt")
     print("── 구성요소 검사 ──")
     results = {
         "observation": observation(lab, pipeline.observation),
@@ -234,7 +262,8 @@ class _M4(_Correct):
 
 
 def invariant_tests(lab, test_fn):
-    """test_fn(pipeline, lab): 참조 없이 버그를 잡는 테스트. 올바른 파이프라인은 통과, 버그 변형은 실패해야 합니다."""
+    """[오라클] test_fn(pipeline, lab): 올바른 파이프라인은 통과, 버그 변형 4종은 AssertionError여야 합니다."""
+    _count("invariant_tests")
     try:
         test_fn(_Correct(), lab)
         ok = _say(True, "올바른 파이프라인에서 통과")
@@ -252,12 +281,25 @@ def invariant_tests(lab, test_fn):
         except Exception as error:  # noqa: BLE001
             print(f"   버그 유형 {i}: 테스트가 AssertionError 대신 {type(error).__name__}로 중단")
         lab.sim.reset(lab.motion)
-    return _say(ok and caught == 4, f"Mission 2-2 불변식 테스트: 버그 {caught}/4 검출")
+    return _say(ok and caught == 4, f"불변식 테스트: 버그 {caught}/4 검출")
 
 
 # ---------------------------------------------------------------------------
 # Day 3
 # ---------------------------------------------------------------------------
+
+REFLECTION_KEYS = ["예측과 실제가 달랐던 것", "AI가 틀렸던 순간과 알아챈 방법",
+                   "가장 믿을 만한 ✅와 그 근거", "정답 비교 없이 내가 확인한 것"]
+
+
+def reflection(card: dict):
+    """매 Day 마지막 제출 카드. 에이전트가 아니라 본인이 작성합니다."""
+    missing = [k for k in REFLECTION_KEYS if len(str(card.get(k, "")).strip()) < 5]
+    _say(not missing, "제출 카드", "비었거나 너무 짧은 항목: " + ", ".join(missing) if missing else "")
+    if ORACLE_CALLS:
+        print("   정답 비교 호출 기록:", ORACLE_CALLS)
+    return not missing
+
 
 def experiment_card(card: dict):
     need = ["가설", "변인", "지표", "통제조건", "결과", "해석", "한계"]
