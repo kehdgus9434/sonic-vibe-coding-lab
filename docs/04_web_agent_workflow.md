@@ -27,6 +27,7 @@
    AGENTS.md 규칙을 따른다. docs/01_contract.md만 근거로 my_work/day1.py의 Mission 1-1~1-3을 구현해.
    day1 브랜치에 커밋·push하고 main으로 PR을 열어. 🔮/🧾/📮 칸은 건드리지 마.
    ```
+   > ⚠️ Fork에서 PR을 만들면 GitHub은 받는 쪽(base)을 **원본 저장소**로 기본 선택합니다. PR 화면 위쪽 `base repository`를 **내 Fork**(`내아이디/sonic-vibe-coding-lab`)로 바꾸세요. 에이전트에게도 "내 Fork의 main으로 PR"이라고 분명히 지시합니다.
 2. **자동 리포트 확인** (push 후 3–6분)
    - PR이 열려 있으면 **PR 댓글**로 옵니다. 없으면 Actions 탭 → `student-check` 실행 → **Summary**.
    - 내용: Day 1 미션별 ✅/❌/⬜, Day 2 *내* 불변식 테스트 결과와 폐루프 실행 표, Day 3 실험 표·그래프, 로봇 동작 GIF.
