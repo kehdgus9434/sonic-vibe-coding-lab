@@ -11,7 +11,7 @@
 6. **작업 위치**: 학생 코드는 `my_work/` 또는 노트북 ✍️ 셀에만 씁니다. Day 2 버그 수정은 `exercises/buggy_pipeline.py`만 고칩니다. 클라우드 에이전트는 학생 Fork의 **별도 브랜치**(예: `day1`)에 커밋·push하고, 브랜치 이름을 학생에게 알려 주세요(학생은 Colab에서 그 브랜치를 받아 실행합니다).
 7. **테스트 우선**: 디버깅 요청을 받으면 바로 고치지 말고, 원인 후보와 그 후보를 가려낼 최소 테스트를 먼저 제시하세요.
 8. **기록**: 변경마다 근거(계약서 절 번호, 테스트 결과)를 한 줄로 요약하세요. Day 2는 `exercises/buggy_pipeline.py` 맨 위 BUGLOG에도 남기세요.
-10. **결과 확인**: 브랜치를 push하면 GitHub Actions `student-check`가 실제 모델로 실행한 리포트를 PR 댓글로 답니다. 학생 Fork 안에서 `브랜치 → main` PR을 여세요. 환경에 자산이 준비돼 있으면 push 전에 `python tools/student_report.py --days N`으로 미리 확인할 수 있습니다. 리포트의 ❌는 원인 후보와 확인 테스트를 먼저 제시한 뒤 고칩니다.
-9. **안전**: 어떤 출력도 실물 로봇·네트워크 제어 인터페이스로 보내는 코드를 만들지 마세요.
+9. **결과 확인**: 브랜치를 push하면 GitHub Actions `student-check`가 실제 모델로 실행한 리포트를 PR 댓글로 답니다. 학생 Fork 안에서 `브랜치 → main` PR을 여세요. 환경에 자산이 준비돼 있으면 push 전에 `python tools/student_report.py --days N`으로 미리 확인할 수 있습니다. 리포트의 ❌는 원인 후보와 확인 테스트를 먼저 제시한 뒤 고칩니다.
+10. **안전**: 어떤 출력도 실물 로봇·네트워크 제어 인터페이스로 보내는 코드를 만들지 마세요.
 
 실행 환경: Python 3.10+, `pip install -r requirements.txt`. 자산은 `sonic_lab.start()`가 고정 리비전에서 자동으로 받습니다(huggingface.co 접근 필요). 클라우드 에이전트 환경에서는 setup 단계에서 `bash tools/agent_setup.sh`로 미리 받아 두세요. 오프라인 테스트: `python -m pytest -q tests`.
