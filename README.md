@@ -1,5 +1,7 @@
 # SONIC 바이브 코딩 랩 — 휴머노이드 전신 제어 모델을 AI와 함께 해부·디버깅·실험하기
 
+[![real-model-check](https://github.com/kehdgus9434/sonic-vibe-coding-lab/actions/workflows/real-model-check.yml/badge.svg)](https://github.com/kehdgus9434/sonic-vibe-coding-lab/actions/workflows/real-model-check.yml) [![offline-tests](https://github.com/kehdgus9434/sonic-vibe-coding-lab/actions/workflows/test.yml/badge.svg)](https://github.com/kehdgus9434/sonic-vibe-coding-lab/actions/workflows/test.yml)
+
 NVIDIA **GEAR-SONIC** 공개 모델(사람/로봇 모션 → 64차원 토큰 → Unitree G1 29관절 제어)을 Google Colab에서 실행하며,
 **AI 코딩 도구가 만든 연구 코드를 어떻게 믿을 수 있게 만드는지** 3일(2시간 × 3회) 동안 실습합니다.
 
@@ -39,16 +41,13 @@ sonic_lab/            실습 지원 패키지 (자산 다운로드, 참조 구�
   └─ check.py         ⚠️ 채점 로직 — 실습 중에는 열지 않기
 AGENTS.md, CLAUDE.md  에이전트형 도구가 자동으로 읽는 실습 규칙
 tests/                관리자용 오프라인 테스트 (가짜 모델)
-tools/                노트북 생성기(build_notebooks.py), 저장소 주소 변경(set_repo.py)
+tools/                노트북 생성기(build_notebooks.py), 저장소 주소 변경(set_repo.py), 실제 모델 점검(real_model_check.py)
 ```
 
-## 강사: GitHub에 올린 뒤 할 일
+## 관리
 
-```bash
-python tools/set_repo.py <GitHub ID 또는 조직>/<저장소 이름>   # Colab 배지·클론 주소 일괄 변경
-git commit -am "Set repository URL" && git push
-```
-그다음 강사용 사전 점검 노트북으로 Colab에서 실제 모델 결과(완주·버그 재현·소요 시간)를 확인하세요.
+저장소를 옮기거나 Fork해서 쓸 때는 `python tools/set_repo.py <ID>/<저장소>`로 Colab 배지·클론 주소를 한 번에 바꿉니다.
+코드가 바뀌면 GitHub Actions의 `real-model-check`가 실제 NVIDIA 모델로 기준 3조건·버그 재현·Day 3 예시·렌더링·노트북 3개 실행을 자동 점검합니다(결과는 Actions 실행 페이지 Summary).
 
 ## 출처와 라이선스
 

@@ -291,6 +291,7 @@ render.show(render.skeleton_video(lab, bug_arrays, "outputs/day2_buggy.mp4", tit
   2. 테스트로 확인된 것만 고칩니다. 고칠 때마다 파일 맨 위 `BUGLOG`에 "무엇을, 어떤 근거로"를 적습니다.
   3. 파일 저장 → `load_buggy` 셀 → ✅ 셀 재실행.
 - **완료 기준**: 구성요소 3/3 통과 + 폐루프 250프레임 완주
+- ⚠️ **넘어지지 않는다고 끝이 아닙니다.** 4개 중에는 로봇이 넘어지지 않고 *동작만 조금 틀어지는* 버그도 있습니다. 완주해도 구성요소 검사가 ❌면 아직 남은 것입니다.
 - ⚠️ Colab 런타임이 끊기면 파일 수정도 사라집니다. 고친 코드를 수시로 아래 메모 셀에 복사해 두세요.
 """),
         code('''
@@ -427,7 +428,7 @@ for label in ["cond:0", "cond:2"]:
 | 카드 | 질문 | 힌트 |
 |---|---|---|
 | A. 좌우 반전 | 반전 모션도 같은 품질로 추종할까? | `lab.load_motion(mirrored=True)` (공식 `_M` 샘플) |
-| B. 외란 강건성 | 골반을 몇 N으로 밀면 넘어질까? | `run_physics(..., on_frame=fn)`에서 `sim.data.xfrc_applied[sim.pelvis_id, :3]` 설정. **힘을 끄는 것도 잊지 말 것** |
+| B. 외란 강건성 | 골반을 몇 N으로 밀면 넘어질까? | `run_physics(..., on_frame=fn)`에서 `sim.data.xfrc_applied[sim.pelvis_id, :3]` 설정. **힘을 끄는 것도 잊지 말 것.** 수백 N을 잠깐 미는 정도로는 버팁니다 — 크기와 지속시간을 함께 바꿔 경계를 찾으세요 |
 | C. 입력 잡음·지연 | 사람 관절 위치에 잡음 σ cm, 또는 k프레임 지연이 생기면? | `dataclasses.replace(lab.motion, local24=...)` |
 | D. 재생 속도 | 0.8배/1.2배 속도 걷기도 따라갈까? | 시간축 재보간: 위치는 선형, 회전은 SLERP (계약서 1절) |
 | E. 손목 정보 제거 | 손목 각도를 0으로 바꾸면(근사 데이터의 한계)? | `replace(lab.motion, wrists_il=np.zeros_like(...))` |
