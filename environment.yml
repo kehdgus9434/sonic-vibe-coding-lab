@@ -1,0 +1,9 @@
+# Ubuntu 22.04 + conda 로컬 실행용 (Colab에서는 필요 없음)
+name: sonic-lab
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - -r requirements.txt

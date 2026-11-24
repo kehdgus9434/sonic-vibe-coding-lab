@@ -1,0 +1,5 @@
+# Colab에 기본 설치되지 않은 패키지만 (numpy, scipy, pandas, matplotlib, pyyaml, joblib, imageio, pillow는 기본 포함)
+onnxruntime>=1.19,<2
+mujoco>=3.3,<4
+imageio-ffmpeg>=0.5,<1
+PyOpenGL>=3.1
