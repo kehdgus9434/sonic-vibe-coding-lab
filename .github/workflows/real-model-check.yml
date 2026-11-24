@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with: {python-version: "3.12"}
       - name: System packages (Colab CPU 런타임과 같은 소프트웨어 렌더러)
         run: sudo apt-get update -qq && sudo apt-get install -y -qq libosmesa6 ffmpeg
@@ -19,7 +19,7 @@ jobs:
         run: pip install -q -r requirements-colab.txt numpy scipy pandas matplotlib pyyaml joblib imageio pillow nbclient nbformat ipykernel
       - run: python -m ipykernel install --user --name python3
       - run: python tools/real_model_check.py --out outputs/real_check
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         if: always()
         with:
           name: real-model-check
