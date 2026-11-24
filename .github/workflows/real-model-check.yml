@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["sonic_lab/**", "notebooks/**", "exercises/**", "requirements*.txt", "tools/real_model_check.py", ".github/workflows/real-model-check.yml"]
+    paths: ["tools/agent_setup.sh", "pyproject.toml", "sonic_lab/**", "notebooks/**", "exercises/**", "requirements*.txt", "tools/real_model_check.py", ".github/workflows/real-model-check.yml"]
 jobs:
   colab-like:
     runs-on: ubuntu-22.04
@@ -18,6 +18,8 @@ jobs:
       - name: Python packages (Colab 기본 패키지 + requirements-colab.txt)
         run: pip install -q -r requirements-colab.txt numpy scipy pandas matplotlib pyyaml joblib imageio pillow nbclient nbformat ipykernel
       - run: python -m ipykernel install --user --name python3
+      - name: 웹 에이전트 setup 스크립트 점검 (Claude Code on the web / Codex에 붙여 넣는 것과 동일)
+        run: SONIC_LAB_REPO=https://github.com/${{ github.repository }} bash tools/agent_setup.sh
       - run: python tools/real_model_check.py --out outputs/real_check
       - uses: actions/upload-artifact@v5
         if: always()
