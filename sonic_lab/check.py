@@ -1,13 +1,10 @@
-"""미션 체크포인트.
+"""TODO 자가 확인(self-check).
 
-학생이 바이브 코딩으로 작성한 함수를 참조 구현(`sonic_lab.reference`)과 수치 비교합니다.
-불일치하면 '어느 블록이 어떤 식으로' 다른지만 알려주고, 고치는 방법은 알려주지 않습니다.
-(이 파일과 reference.py를 열어 정답을 베끼는 것은 실습 취지에 맞지 않습니다.)
+각 TODO 셀 끝에서 호출되어, 채운 값/함수를 참조 구현(`sonic_lab.reference`)과 비교하고 ✅/❌를 출력합니다.
+평가용이 아니라 "다음 셀로 넘어가도 되는지" 알려 주는 용도입니다.
 """
 
 from __future__ import annotations
-
-from collections import deque
 
 import numpy as np
 from scipy.spatial.transform import Rotation as R
@@ -15,12 +12,6 @@ from scipy.spatial.transform import Rotation as R
 from . import reference as ref
 
 OK, NG = "✅", "❌"
-ORACLE_CALLS = {}   # Day 2: 정답 비교(오라클) 호출 횟수
-
-
-def _count(name):
-    ORACLE_CALLS[name] = ORACLE_CALLS.get(name, 0) + 1
-    print(f"🔎 정답 비교 '{name}' {ORACLE_CALLS[name]}회째")
 
 
 def _say(ok, title, detail=""):
@@ -47,138 +38,78 @@ def _diagnose(student, expected, atol=1e-5):
     return f"최대 오차 {err.max():.4g}, 불일치 원소 {(err > atol).sum()}/{e.size}개"
 
 
+def _random_pose(rng):
+    return R.from_euler("zyx", [rng.uniform(-np.pi, np.pi), rng.normal(0, .05), rng.normal(0, .05)]).as_quat()
+
+
 # ---------------------------------------------------------------------------
-# Day 1
+# Lab 1
 # ---------------------------------------------------------------------------
 
-def onnx_io(enc_in, enc_out, dec_in, dec_out):
-    """Encoder/Decoder 입력·출력의 마지막 차원."""
+def onnx_io(enc_in, enc_out, dec_in, dec_out, title="ONNX 입출력 차원"):
     got = tuple(int(x) for x in (enc_in, enc_out, dec_in, dec_out))
     want = (1762, 64, 994, 29)
-    return _say(got == want, "Mission 1-1 ONNX 입출력 차원", "" if got == want else f"입력값 {got} — 세션의 get_inputs()/get_outputs()를 확인하세요")
+    return _say(got == want, title, "" if got == want else f"입력값 {got} — 위에 출력된 shape의 마지막 숫자를 다시 보세요")
 
 
-def encoder_slices(lab, slices):
-    """{관측 이름: slice 또는 (start, stop)} 형태."""
+def encoder_slices(lab, slices, title="Encoder 1762칸 블록 표"):
+    """slices: {관측 이름: slice 또는 (start, stop)}"""
     expected = lab.contract.enc_slices
-    ok = True
-    names = list(slices)
-    if names != list(expected):
-        ok = _say(False, "Mission 1-2 Encoder 블록 순서", "이름 목록/순서가 YAML의 enabled 관측 순서와 다릅니다")
+    ok = list(slices) == list(expected)
+    if not ok:
+        _say(False, "  블록 순서", "YAML의 enabled 관측 순서와 다릅니다")
     for name, exp in expected.items():
         got = slices.get(name)
         if got is None:
             continue
         start, stop = (got.start, got.stop) if isinstance(got, slice) else tuple(got)
         if (start, stop) != (exp.start, exp.stop):
-            ok = _say(False, f"  {name}", f"[{start}:{stop}] — 이 블록의 길이 또는 시작 위치를 다시 계산하세요")
-    total = max((s.stop if isinstance(s, slice) else s[1]) for s in slices.values()) if slices else 0
-    return _say(ok and total == 1762, "Mission 1-2 Encoder 1762차원 블록 표", f"총 길이 {total}")
+            ok = _say(False, f"  {name}", f"[{start}:{stop}] — 이 블록의 크기를 다시 계산하세요")
+    return _say(ok, title)
 
 
-def root_quat_order(answer: str):
+def root_quat_order(answer: str, title="G1 root_rot 쿼터니언 순서"):
     ok = str(answer).lower().strip() == "xyzw"
-    return _say(ok, "Mission 1-3 G1 root_rot 쿼터니언 순서",
-                "pose_aa[:,0]와 비교해 오차가 ~0인 쪽을 고르세요" if not ok else "")
+    return _say(ok, title, "" if ok else "오차가 ~0°인 쪽이 정답입니다")
 
 
-def resampled_motion(lab, times, g1_q50):
+def resampled_motion(lab, times, g1_q50, title="30 Hz → 50 Hz 정렬"):
     m = lab.motion
     times, g1_q50 = np.asarray(times), np.asarray(g1_q50)
-    ok_t = _say(times.shape == m.times.shape and np.allclose(times, m.times), "Mission 1-4 50 Hz 시간축",
-                f"길이 {len(times)} (기대 {len(m.times)}) — 두 파일의 fps와 길이가 다릅니다. 짧은 쪽에 맞추세요" if times.shape != m.times.shape else "")
-    if not ok_t:
-        return False
+    if times.shape != m.times.shape:
+        return _say(False, title, f"프레임 수 {len(times)} (기대 {len(m.times)}) — 두 데이터가 모두 있는 구간(짧은 쪽)을 쓰세요")
     detail = _diagnose(g1_q50, m.g1_q, atol=1e-6)
-    return _say(not detail, "Mission 1-4 G1 관절각 30→50 Hz 보간", detail)
+    return _say(not detail, title, detail)
 
 
-def _random_pose(rng):
-    return R.from_euler("zyx", [rng.uniform(-np.pi, np.pi), rng.normal(0, .05), rng.normal(0, .05)]).as_quat()
-
-
-def encoder_obs(lab, fn, frames=(0, 137, 1000, 1995), seed=0):
-    """fn(motion, frame, robot_xyzw, alignment) -> (1762,) Mode-2 encoder 입력."""
+def encoder_obs(lab, fn, frames=(0, 137, 1000, 1995), seed=0, mode=2, title=None):
+    """fn(motion, frame, robot_xyzw, alignment) -> (1762,)"""
+    title = title or f"Mode-{mode} Encoder 입력 1762칸"
     rng = np.random.default_rng(seed)
     ok = True
     for frame in frames:
         robot = _random_pose(rng)
         alignment = R.from_euler("z", rng.uniform(-np.pi, np.pi))
-        expected = lab.policy.encoder_obs(lab.motion, frame, robot, alignment, mode=2)
+        expected = lab.policy.encoder_obs(lab.motion, frame, robot, alignment, mode=mode)
         got = _as_vec(fn(lab.motion, frame, robot, alignment))
         if got.shape != expected.shape:
-            return _say(False, "Mission 1-5 Encoder 입력", f"길이 {got.size} ≠ 1762")
+            return _say(False, title, f"길이 {got.size} ≠ 1762")
         for name, sl in lab.contract.enc_slices.items():
             detail = _diagnose(got[sl], expected[sl])
             if detail:
                 ok = _say(False, f"  frame {frame} · {name}", detail)
-    if ok:
-        token = lab.policy.encode_obs(fn(lab.motion, 0, lab.sim.base_xyzw(), R.identity()))
-        print(f"   토큰 미리보기(앞 6개): {np.round(token[:6], 3)}")
-    return _say(ok, "Mission 1-5 Mode-2 Encoder 입력 1762차원")
-
-
-def encoder_obs_mode0(lab, fn, frames=(0, 137, 1000, 1995), seed=4):
-    """[심화] fn(motion, frame, robot_xyzw, alignment) -> (1762,) Mode-0(G1 참조) encoder 입력."""
-    rng = np.random.default_rng(seed)
-    ok = True
-    for frame in frames:
-        robot = _random_pose(rng)
-        alignment = R.from_euler("z", rng.uniform(-np.pi, np.pi))
-        expected = lab.policy.encoder_obs(lab.motion, frame, robot, alignment, mode=0)
-        got = _as_vec(fn(lab.motion, frame, robot, alignment))
-        if got.shape != expected.shape:
-            return _say(False, "심화 Mode-0 Encoder 입력", f"길이 {got.size} ≠ 1762")
-        for name, sl in lab.contract.enc_slices.items():
-            detail = _diagnose(got[sl], expected[sl])
-            if detail:
-                ok = _say(False, f"  frame {frame} · {name}", detail)
-    return _say(ok, "심화 Mode-0 Encoder 입력 1762차원")
+    return _say(ok, title)
 
 
 # ---------------------------------------------------------------------------
-# Day 2
+# Lab 2
 # ---------------------------------------------------------------------------
 
-def _random_history(rng):
-    return [{"omega": rng.normal(size=3), "q": rng.normal(size=29), "dq": rng.normal(size=29),
-             "action": rng.normal(size=29), "gravity": rng.normal(size=3)} for _ in range(10)]
-
-
-def decoder_obs(lab, fn, seed=1):
-    """fn(token, history) -> (994,). history는 오래된 것 → 최신 순서의 10개 dict."""
-    rng = np.random.default_rng(seed)
-    token, history = rng.normal(size=64).astype(np.float32), _random_history(rng)
-    expected = ref.Policy.decoder_obs(token, history)
-    got = _as_vec(fn(token, [dict(h) for h in history]))
-    if got.shape != expected.shape:
-        return _say(False, "Decoder 입력 994차원", f"길이 {got.size} ≠ 994")
-    ok, start = True, 0
-    for name, size in ref.DEC_DIMS.items():
-        detail = _diagnose(got[start:start + size], expected[start:start + size])
-        if detail:
-            ok = _say(False, f"  {name}", detail)
-        start += size
-    return _say(ok, "Decoder 입력 994차원")
-
-
-def action_to_target(lab, fn, seed=2):
-    """fn(action_il, contract) -> (29,) MuJoCo 순서 PD 목표 관절각."""
-    rng = np.random.default_rng(seed)
-    action = rng.normal(size=29)
-    detail = _diagnose(fn(action.copy(), lab.contract), ref.action_to_target(action, lab.contract))
-    zero = _diagnose(fn(np.zeros(29), lab.contract), lab.contract.default)
-    if zero:
-        detail = (detail + " / " if detail else "") + "action=0일 때 기본 자세가 나오지 않습니다"
-    return _say(not detail, "액션 → PD 목표 관절각", detail)
-
-
-def observation(lab, fn, seed=3, trials=4):
-    """fn(sim, previous_action) -> dict(omega, q, dq, action, gravity)."""
+def observation(lab, fn, seed=3, trials=4, title="로봇 관측(proprioception)"):
+    """fn(sim, previous_action) -> dict(omega, q, dq, action, gravity)"""
     import mujoco
     rng = np.random.default_rng(seed)
-    sim, ok = lab.sim, True
-    diffs, details = {}, {}
+    sim, ok, details = lab.sim, True, {}
     for _ in range(trials):
         sim.reset(lab.motion)
         sim.data.qpos[3:7] = np.roll(_random_pose(rng), 1)  # wxyz
@@ -189,106 +120,62 @@ def observation(lab, fn, seed=3, trials=4):
         expected = sim.observation(prev)
         got = fn(sim, prev.copy())
         for key in ref.HISTORY_KEYS:
-            if key not in got:
-                sim.reset(lab.motion)
-                return _say(False, "로봇 관측", f"키 '{key}' 없음")
-            detail = _diagnose(got[key], expected[key])
+            detail = "키 없음" if key not in got else _diagnose(got[key], expected[key])
             if detail:
                 details[key] = detail
-                diffs.setdefault(key, []).append(_as_vec(got[key]) - _as_vec(expected[key]))
-    for key, detail in details.items():
-        d = np.asarray(diffs[key])
-        if len(d) == trials and np.allclose(d, d[0], atol=1e-6):
-            detail += " · 상태와 무관한 '고정 오프셋'만큼 다릅니다"
-        ok = _say(False, f"  {key}", detail)
     sim.reset(lab.motion)
-    return _say(ok, "로봇 관측(proprioception)")
+    for key, detail in details.items():
+        ok = _say(False, f"  {key}", detail)
+    return _say(ok, title)
 
 
-def bughunt(lab, pipeline, frames=250):
-    """[오라클] exercises/buggy_pipeline.py의 Pipeline을 정답과 비교하고 짧은 폐루프를 실행합니다.
-
-    Day 2에서는 Mission 2-3(최종 판정)에서만 사용합니다. 호출 횟수는 기록됩니다.
-    """
-    _count("bughunt")
-    print("── 구성요소 검사 ──")
-    results = {
-        "observation": observation(lab, pipeline.observation),
-        "decoder_obs": decoder_obs(lab, pipeline.decoder_obs),
-        "action_to_target": action_to_target(lab, pipeline.action_to_target),
-    }
-    print(f"── 폐루프 {frames}프레임({frames / 50:.0f}초) 실행 ──")
-    summary, _ = ref.run_physics(lab.sim, lab.policy, lab.motion, 2, max_frames=frames, pipeline=pipeline)
-    _say(summary["completed"], "Human 모드 2 폐루프",
-         f'{summary["simulated_frames"]}/{frames} 프레임, {summary["stop_reason"]}')
-    fixed = sum(results.values())
-    print(f"\n구성요소 {fixed}/3 통과. (버그는 모두 4개이며 한 구성요소에 2개가 있을 수 있습니다)")
-    return summary
+def decoder_obs(lab, fn, seed=1, title="Decoder 입력 994칸"):
+    """fn(token, history) -> (994,). history는 append로 쌓인 길이 10 목록(마지막이 최신)."""
+    rng = np.random.default_rng(seed)
+    token = rng.normal(size=64).astype(np.float32)
+    history = [{"omega": rng.normal(size=3), "q": rng.normal(size=29), "dq": rng.normal(size=29),
+                "action": rng.normal(size=29), "gravity": rng.normal(size=3)} for _ in range(10)]
+    expected = ref.Policy.decoder_obs(token, history)
+    got = _as_vec(fn(token, [dict(h) for h in history]))
+    if got.shape != expected.shape:
+        return _say(False, title, f"길이 {got.size} ≠ 994")
+    ok, start = True, 0
+    for name, size in ref.DEC_DIMS.items():
+        detail = _diagnose(got[start:start + size], expected[start:start + size])
+        if detail:
+            ok = _say(False, f"  {name}", detail)
+        start += size
+    return _say(ok, title)
 
 
-class _Correct:
-    def observation(self, sim, previous_action):
-        return sim.observation(previous_action)
-
-    def decoder_obs(self, token, history):
-        return ref.Policy.decoder_obs(token, history)
-
-    def action_to_target(self, action, contract):
-        return ref.action_to_target(action, contract)
-
-
-class _M1(_Correct):
-    def observation(self, sim, previous_action):
-        o = sim.observation(previous_action)
-        o["q"] = sim.data.qpos[sim.qaddr][sim.contract.mujoco_to_isaaclab]
-        return o
+def action_to_target(lab, fn, seed=2, title="액션 → 관절 목표각"):
+    """fn(action_il, contract) -> (29,) MuJoCo 순서 목표각"""
+    rng = np.random.default_rng(seed)
+    action = rng.normal(size=29)
+    detail = _diagnose(fn(action.copy(), lab.contract), ref.action_to_target(action, lab.contract))
+    zero = _diagnose(fn(np.zeros(29), lab.contract), lab.contract.default)
+    if zero:
+        detail = (detail + " / " if detail else "") + "action=0일 때 기본 자세가 나오지 않습니다"
+    return _say(not detail, title, detail)
 
 
-class _M2(_Correct):
-    def observation(self, sim, previous_action):
-        o = sim.observation(previous_action)
-        o["gravity"] = R.from_quat(sim.data.qpos[3:7]).inv().apply([0, 0, -1])
-        return o
+# ---------------------------------------------------------------------------
+# Lab 3
+# ---------------------------------------------------------------------------
 
-
-class _M3(_Correct):
-    def decoder_obs(self, token, history):
-        return ref.Policy.decoder_obs(token, list(reversed(list(history))))
-
-
-class _M4(_Correct):
-    def action_to_target(self, action, contract):
-        return contract.default + np.asarray(action)[contract.mujoco_to_isaaclab] * contract.scale
-
-
-def invariant_tests(lab, test_fn):
-    """[오라클] test_fn(pipeline, lab): 올바른 파이프라인은 통과, 버그 변형 4종은 AssertionError여야 합니다."""
-    _count("invariant_tests")
+def body_groups(groups: dict, title="부위별 관절 묶음"):
+    """{이름: range} — MuJoCo 순서 29관절을 다리 12 / 허리 3 / 팔·손목 14로 빠짐없이 나눴는지."""
     try:
-        test_fn(_Correct(), lab)
-        ok = _say(True, "올바른 파이프라인에서 통과")
-    except Exception as error:  # noqa: BLE001
-        lab.sim.reset(lab.motion)
-        return _say(False, "올바른 파이프라인에서도 실패", f"{type(error).__name__}: {error} — 테스트 자체가 틀렸습니다")
-    caught = 0
-    for i, mutant in enumerate([_M1, _M2, _M3, _M4], 1):
-        try:
-            test_fn(mutant(), lab)
-            print(f"   버그 유형 {i}: 놓침")
-        except AssertionError:
-            caught += 1
-            print(f"   버그 유형 {i}: 잡음")
-        except Exception as error:  # noqa: BLE001
-            print(f"   버그 유형 {i}: 테스트가 AssertionError 대신 {type(error).__name__}로 중단")
-        lab.sim.reset(lab.motion)
-    return _say(ok and caught == 4, f"불변식 테스트: 버그 {caught}/4 검출")
-
-
-# ---------------------------------------------------------------------------
-# Day 3
-# ---------------------------------------------------------------------------
-
-def experiment_card(card: dict):
-    need = ["가설", "변인", "지표", "통제조건", "결과", "해석", "한계"]
-    missing = [k for k in need if not str(card.get(k, "")).strip()]
-    return _say(not missing, "실험 카드", "빈 항목: " + ", ".join(missing) if missing else "")
+        idx = sorted(i for r in groups.values() for i in r)
+    except TypeError:
+        return _say(False, title, "range(시작, 끝)를 모두 채우세요")
+    sizes = [len(r) for r in groups.values()]
+    names = [n.replace("_joint", "") for n in ref.MJ_NAMES]
+    if idx != list(range(29)):
+        return _say(False, title, "0–28번 관절이 빠짐없이 한 번씩 들어가야 합니다")
+    ok = sizes == [12, 3, 14]
+    detail = "" if ok else f"묶음 크기 {sizes} (기대 [12, 3, 14]) — 계약서 2절 MuJoCo 순서표를 보세요"
+    if ok:
+        for (name, r) in groups.items():
+            print(f"   {name}: {names[r.start]} … {names[r.stop - 1]}")
+    return _say(ok, title, detail)

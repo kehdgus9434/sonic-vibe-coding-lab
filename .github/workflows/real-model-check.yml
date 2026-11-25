@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["tools/student_report.py", "tools/agent_setup.sh", "pyproject.toml", "sonic_lab/**", "notebooks/**", "exercises/**", "requirements*.txt", "tools/real_model_check.py", ".github/workflows/real-model-check.yml"]
+    paths: ["pyproject.toml", "sonic_lab/**", "notebooks/**", "requirements*.txt", "tools/real_model_check.py", ".github/workflows/real-model-check.yml"]
 jobs:
   colab-like:
-    if: github.repository == 'kehdgus9434/sonic-vibe-coding-lab'   # 학생 Fork에서는 student-check만 실행
+    if: github.repository == 'kehdgus9434/sonic-vibe-coding-lab'   # Fork에서는 실행하지 않음
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     steps:
@@ -19,11 +19,7 @@ jobs:
       - name: Python packages (Colab 기본 패키지 + requirements-colab.txt)
         run: pip install -q -r requirements-colab.txt numpy scipy pandas matplotlib pyyaml joblib imageio pillow nbclient nbformat ipykernel
       - run: python -m ipykernel install --user --name python3
-      - name: 웹 에이전트 setup 스크립트 점검 (Claude Code on the web / Codex에 붙여 넣는 것과 동일)
-        run: SONIC_LAB_REPO=https://github.com/${{ github.repository }} bash tools/agent_setup.sh
       - run: python tools/real_model_check.py --out outputs/real_check
-      - name: 학생 리포트 스크립트 점검 (my_work 미작성 상태)
-        run: python tools/student_report.py --out outputs/real_check/student_report_stub
       - uses: actions/upload-artifact@v5
         if: always()
         with:

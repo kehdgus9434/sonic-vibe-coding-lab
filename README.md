@@ -1,60 +1,49 @@
-# SONIC 바이브 코딩 랩 — 휴머노이드 전신 제어 모델을 AI와 함께 해부·디버깅·실험하기
+# SONIC 실습 — 휴머노이드 전신 제어 모델을 Colab에서 해부하고 실험하기
 
 [![real-model-check](https://github.com/kehdgus9434/sonic-vibe-coding-lab/actions/workflows/real-model-check.yml/badge.svg)](https://github.com/kehdgus9434/sonic-vibe-coding-lab/actions/workflows/real-model-check.yml) [![offline-tests](https://github.com/kehdgus9434/sonic-vibe-coding-lab/actions/workflows/test.yml/badge.svg)](https://github.com/kehdgus9434/sonic-vibe-coding-lab/actions/workflows/test.yml)
 
-NVIDIA **GEAR-SONIC** 공개 모델(사람/로봇 모션 → 64차원 토큰 → Unitree G1 29관절 제어)을 Google Colab에서 실행하며,
-**AI 코딩 도구가 만든 연구 코드를 어떻게 믿을 수 있게 만드는지** 3일(2시간 × 3회) 동안 실습합니다.
+NVIDIA **GEAR-SONIC** 공개 모델(사람/로봇 동작 → 64차원 토큰 → Unitree G1 29관절 제어)을 Google Colab에서 실행하며,
+모델의 입출력 구조 → 폐루프 제어 → 실험까지 3개의 Lab(각 2시간)으로 따라갑니다.
 
-- 대상: 코딩 경험이 있는 대학원생 · 이론 강의 최소화 · 과제 없음
-- 환경: **브라우저만** — 공용 컴퓨터실(Windows)·개인 노트북 어디서나, 설치 없음
-- AI 도구: **자유, 에이전트 사용 전제** — Colab의 Gemini, 웹 채팅(ChatGPT·Claude·Gemini), 웹 코딩 에이전트(Claude Code on the web, Codex)
-- 평가: 코드가 아니라 **판단** — 실행 전 🔮 예측, 체크 후 🧾 검증 기록 (본인 작성)
-- 실행 환경: **Google Colab CPU 런타임**으로 충분 (GPU는 영상 렌더링만 빨라짐)
+- **설치 없음**: 브라우저와 Google 계정만 있으면 됩니다. CPU 런타임으로 충분합니다(공용 PC·개인 노트북 모두 가능).
+- **빈칸 채우기 방식**: 대부분의 코드는 작성되어 있고, `TODO` 셀의 `########### Answer #############` 사이 빈칸(`None`, `_____`)만 채웁니다.
+- **바로 확인**: 각 TODO 아래의 `check.…` / `assert`가 ✅/❌로 알려 줍니다. 별도 제출이나 채점은 없습니다.
 
-## 3일 구성
+## Lab 구성
 
-| | 노트북 | 핵심 질문 | 결과물 |
+| Lab | 노트북 | 내용 | TODO |
 |---|---|---|---|
-| **Day 1** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kehdgus9434/sonic-vibe-coding-lab/blob/main/notebooks/day1_anatomy.ipynb) `day1_anatomy` | 모델과 데이터의 '계약'을 AI와 함께 정확히 읽을 수 있나? | 내가 만든 Encoder 입력 → 토큰 |
-| **Day 2** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kehdgus9434/sonic-vibe-coding-lab/blob/main/notebooks/day2_bughunt.ipynb) `day2_bughunt` | 정답 코드 없이 버그를 잡을 수 있나? (테스트 먼저 → 수정 → 마지막에 정답 비교) | 불변식 테스트 + 버그 4개 수정 + 40초 완주 |
-| **Day 3** | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kehdgus9434/sonic-vibe-coding-lab/blob/main/notebooks/day3_experiment.ipynb) `day3_experiment` | 기준 조건 위에서 나만의 질문을 실험할 수 있나? | 실험 1개 + 결과 영상 |
+| 1 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kehdgus9434/sonic-vibe-coding-lab/blob/main/notebooks/lab1_sonic_encoder.ipynb) `lab1_sonic_encoder` | SONIC 구조, ONNX 입출력, Encoder 입력 1762칸, 쿼터니언 순서, 30→50 Hz 정렬, 토큰 시각화 | 7 |
+| 2 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kehdgus9434/sonic-vibe-coding-lab/blob/main/notebooks/lab2_closed_loop.ipynb) `lab2_closed_loop` | 관측 · Decoder 입력 · 액션 변환으로 G1 40초 걷기, 흔한 실수 4가지의 영향 | 6 |
+| 3 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kehdgus9434/sonic-vibe-coding-lab/blob/main/notebooks/lab3_experiments.ipynb) `lab3_experiments` | 기준 3조건, 부위별 오차, 좌우 반전 · 골반 밀기 · 손목 0 · 재생 속도 실험 | 5 |
 
-각 노트북 맨 위 `0. 실습 환경 준비` 셀만 실행하면 저장소·패키지·공식 자산(약 125 MB)이 자동으로 준비됩니다. 빨리 끝난 사람을 위해 각 노트북 끝에 🚀 심화 미션(대부분 정답 없음)이 있습니다.
+각 노트북 맨 위의 **실습 환경 준비** 셀을 실행하면 이 저장소와 공식 모델·로봇·걷기 샘플(약 125 MB)이 자동으로 준비됩니다.
+Lab마다 끝에 **해석 질문**이 있습니다(제출용이 아니라 스스로 정리하기 위한 질문).
 
-## 먼저 읽을 문서
+## 참고 문서
 
 | 문서 | 내용 |
 |---|---|
-| [`docs/00_setup.md`](docs/00_setup.md) | 브라우저만으로 시작하기: Colab, AI 도구 3가지 방식(Colab Gemini / 웹 채팅 / 웹 코딩 에이전트), 공용 PC 주의 |
-| [`docs/01_contract.md`](docs/01_contract.md) | **입출력 계약서** — AI 코드가 맞는지 판단하는 유일한 기준. 바이브 코딩 도구에 통째로 넣으세요 |
-| [`docs/02_vibe_coding_guide.md`](docs/02_vibe_coding_guide.md) | 연구 코드 바이브 코딩 원칙, 프롬프트 템플릿, 이 자료가 만들어진 실제 과정(01→08) |
-| [`docs/03_checklist.md`](docs/03_checklist.md) | AI가 만든 연구 코드 검증 체크리스트 |
-| [`docs/04_web_agent_workflow.md`](docs/04_web_agent_workflow.md) | 웹 코딩 에이전트(Claude Code on the web·Codex) → push → **GitHub이 실제 모델로 자동 실행해 PR 댓글로 결과(표·그래프·로봇 GIF)와 Colab 링크 제공** |
+| [`docs/00_setup.md`](docs/00_setup.md) | Colab에서 시작하기, AI 도구 활용 팁, 공용 PC 주의 |
+| [`docs/01_contract.md`](docs/01_contract.md) | 입출력 계약서 — 관절 순서표, 좌표계·쿼터니언 규칙, Encoder/Decoder 블록 구성 |
 
 ## 저장소 구조
 
 ```
-notebooks/            Day 1–3 실습 노트북 (Colab)
-docs/                 계약서 · 가이드 · 체크리스트
-exercises/            Day 2 버그 사냥 대상 (buggy_pipeline.py)
-my_work/              에이전트형 도구 사용자의 미션 작성 파일
-templates/            프롬프트 로그
-sonic_lab/            실습 지원 패키지 (자산 다운로드, 참조 구현, 체크포인트, 렌더링)
-  ├─ reference.py     ⚠️ 정답 구현 — 실습 중에는 열지 않기
-  └─ check.py         ⚠️ 채점 로직 — 실습 중에는 열지 않기
-AGENTS.md, CLAUDE.md  에이전트형 도구가 자동으로 읽는 실습 규칙
-tests/                관리자용 오프라인 테스트 (가짜 모델)
-tools/                노트북 생성기, 학생 자동 리포트(student_report.py), 실제 모델 점검, 웹 에이전트 환경 준비(agent_setup.sh)
+notebooks/        Lab 1–3 노트북 (Colab)
+docs/             시작하기 · 입출력 계약서
+sonic_lab/        실습 지원 패키지 (공식 자산 다운로드, 참조 구현, 자가 확인, 렌더링)
+tools/            실제 모델 점검 스크립트 (GitHub Actions)
+tests/            오프라인 테스트
 ```
 
-## 관리
+## 이전 버전
 
-저장소를 옮기거나 Fork해서 쓸 때는 `python tools/set_repo.py <ID>/<저장소>`로 Colab 배지·클론 주소를 한 번에 바꿉니다.
-코드가 바뀌면 GitHub Actions의 `real-model-check`가 실제 NVIDIA 모델로 기준 3조건·버그 재현·Day 3 예시·렌더링·노트북 3개 실행을 자동 점검합니다(결과는 Actions 실행 페이지 Summary).
+AI 에이전트로 전체를 구현하고 예측·검증 기록으로 평가하던 이전 구성은 [`v1-agent-judgment`](https://github.com/kehdgus9434/sonic-vibe-coding-lab/tree/v1-agent-judgment) 브랜치에 있습니다.
 
 ## 출처와 라이선스
 
 - 모델·샘플: [nvidia/GEAR-SONIC](https://huggingface.co/nvidia/GEAR-SONIC) (NVIDIA Open Model License) — 실행 시 고정 리비전 `6733128a`에서 내려받으며 이 저장소에 포함하지 않습니다.
 - G1 모델·정책 파라미터: [NVlabs/GR00T-WholeBodyControl](https://github.com/NVlabs/GR00T-WholeBodyControl) 고정 리비전 `4f5e118a`에서 실행 시 내려받습니다.
-- `sonic_lab/reference.py`는 AI인력양성사업 교육자료 07번 노트북(Colab에서 공식 샘플 2,002프레임 완주 확인)의 구현을 교육용으로 정리한 것입니다.
-- ⚠️ 이 저장소의 출력은 시뮬레이션 전용입니다. **실물 로봇에 보내지 마세요.** 완주는 "넘어지지 않고 실행됨"이며 동작 품질 검증이 아닙니다.
+- `sonic_lab/reference.py`는 AI인력양성사업 교육자료 07번 노트북(공식 샘플 2,002프레임 완주 확인)의 구현을 교육용으로 정리한 것입니다.
+- ⚠️ 출력은 시뮬레이션 전용입니다. **실물 로봇에 보내지 마세요.** 완주는 "넘어지지 않고 실행됨"이며 동작 품질 검증이 아닙니다.
